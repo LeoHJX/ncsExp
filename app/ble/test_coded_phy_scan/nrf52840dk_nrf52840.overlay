@@ -1,0 +1,65 @@
+/* SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic */
+
+&uart1 {
+	compatible = "nordic,nrf-uarte";
+	status = "disabled";
+/*	label = "UART_1";
+	current-speed = < 0x1c200 >;
+	tx-pin = < 0x6 >;
+	rx-pin = < 0x8 >;
+	rts-pin = < 0x5 >;
+    cts-pin = < 0x7 >;
+*/
+};
+
+/*  free up pings for the UART. */
+&spi3 {
+	status = "disabled";
+};
+/* free up pins for the UART */
+&i2c1 {
+	status = "disabled"; 
+};
+
+&i2c0 {
+	status = "disabled";
+};
+
+&pwm0 {
+	status = "disabled";
+};
+
+&spi0 {
+	/* Cannot be used together with i2c0. */
+	 status = "disabled";  /**/
+
+};
+
+&spi1 {
+	status = "disabled";
+};
+
+&spi2 {
+	status = "disabled";
+};
+
+&qspi {
+	status = "disabled";
+};
+
+
+&uart0 {
+	status = "okay";
+	label = "UART_0";
+	compatible = "nordic,nrf-uart";
+    current-speed = < 0x1c200 >;
+/*	tx-pin = < 0x6 >;
+    rx-pin = < 0x1 >;
+  */  /* un comments this for testing with DK */
+
+ /*        use this with ozzard board */
+ /*  	*/
+	tx-pin = < 0x1F >;
+	rx-pin = < 0x2E >;
+
+};

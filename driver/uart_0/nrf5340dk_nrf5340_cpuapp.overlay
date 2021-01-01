@@ -13,7 +13,7 @@
 	status = "okay";
 	label = "UART_0";
 	compatible = "nordic,nrf-uarte";
-    current-speed = < 0x1c200 >;
+	current-speed = < 0x1c200 >;
 	tx-pin = < 0x14 >;
 	rx-pin = < 0x16 >;
 	rts-pin = < 0x13 >;

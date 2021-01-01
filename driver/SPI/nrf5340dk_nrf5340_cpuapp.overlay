@@ -1,0 +1,10 @@
+// SEGGER Embedded Studio auto generated
+&spi1 { compatible = "nordic,nrf-spim"; };
+&spi1 { status = "ok"; };
+&spi1 { mosi-pin = < 4 >; };
+&spi1 { miso-pin = < 10 >; };
+&spi1 { / = / < 5 >; };
+&spi1 { sck-pin = < 6 >; };
+&spi2 { status = "disabled"; };
+&i2c1 { status = "disabled"; };
+&i2s0 { status = "ok"; };

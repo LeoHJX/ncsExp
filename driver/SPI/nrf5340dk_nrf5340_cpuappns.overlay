@@ -1,0 +1,15 @@
+&spi1 {
+	compatible = "nordic,nrf-spim";
+	status = "ok";
+	mosi-pin = <4>;
+	miso-pin = <10>;	//<10>;	//<5>;
+	sck-pin = <6>;
+};
+
+&spi2 {
+	status = "disabled";
+};
+
+&i2c1 {
+    status = "disabled";
+};

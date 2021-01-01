@@ -1,0 +1,66 @@
+1: create your own folder <could be any where, under ncs folder or outside(not tested yet)>
+2: copy a example code that very close to the applicaton you needed to develop. this example is a hello world. 
+3: copy the boards folder to the project folder as well, this example, copy zephyr/boards/arm/nrf9160dk_nrf9160  to the <prj>/boards/arm/ (same boards name for now, then we can edit it later)
+4: delete the folder doc (under the baord folder, not needed as will be modified and won't be the same anyway.)
+5: delete other files that won't be needed for this project, for example, the nrf52840_reset.c is not needed in this example project. so delete that. 
+6: rename the board folder, for example to change to hello_board
+7: rename all the files in the board folder. from nrf9160dk_nrf9160  to hello_board. 
+8: replace all nrf9160dk_nrf9160 to hello_board. 
+
+9: add this line list(APPEND BOARD_ROOT ${CMAKE_CURRENT_SOURCE_DIR})  in /src/CMakeList.txt
+
+Now compile the code with command "west build -b hello_board", should compile pass and flash it with command "west flash". 
+    this example will output the follow to the default com port. 
+    *** Booting Zephyr OS build v2.4.0-ncs1  ***
+    Hello World! hello_board
+
+Now change the DTS file to see if ok to change the pin mapping to another COM.
+
+for example: 
+
+&uart0 {
+	status = "okay";
+	current-speed = <115200>;
+	tx-pin = <1>;  // from 29
+	rx-pin = <0>;   // from 28
+	rts-pin = <27>;
+	cts-pin = <26>;
+};
+
+&uart1 {
+	status = "okay";
+	current-speed = <115200>;
+	tx-pin = <29>; // from 1
+	rx-pin = <28>; // from 0
+	rts-pin = <14>;
+	cts-pin = <15>;
+};
+
+Now the main printing and booting message should output to another COM port instead the previous one. 
+
+Now lets try to add AT command interface to to the hello world. 
+
+basically copy the prj.conf from the nrf/samples/nrf9160/at_client/prj.conf to the current prj.conf
+
+
+# General config
+CONFIG_ASSERT=y
+
+# Network
+CONFIG_NETWORKING=y
+CONFIG_NET_NATIVE=n
+CONFIG_NET_SOCKETS=y
+CONFIG_NET_SOCKETS_OFFLOAD=y
+CONFIG_NET_SOCKETS_POSIX_NAMES=y
+# BSD library
+CONFIG_BSD_LIBRARY=y
+
+# AT host library
+CONFIG_AT_HOST_LIBRARY=y
+CONFIG_UART_INTERRUPT_DRIVEN=y
+
+# Stacks and heaps
+CONFIG_MAIN_STACK_SIZE=3072
+CONFIG_HEAP_MEM_POOL_SIZE=16384
+
+Now AT commands should be working with COM4(the middle one which the default at_client examples works with the last COM5)

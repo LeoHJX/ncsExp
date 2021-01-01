@@ -6,19 +6,14 @@ RTT debug
 Overview
 ********
 
-Printk message to RTT console and free up the UART for console. 
+Printk message to RTT console, free UART_0 for other tasts. 
 
 Building and Running
 ********************
 
-This application can be built and executed on QEMU as follows:
+This application can be built to nRF boards:
 
-.. zephyr-app-commands::
-   :zephyr-app: 
-   :host-os: unix
-   :board: nrf boards
-   :goals: run
-   :compact:
+	Tested target board nrf5340dk_nrf5340_cpuapp
 
 To build for another board, change "qemu_x86" above to that board's name.
 

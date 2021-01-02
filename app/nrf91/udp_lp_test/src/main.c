@@ -20,13 +20,12 @@ K_SEM_DEFINE(lte_connected, 0, 1);
 static void server_transmission_work_fn(struct k_work *work)
 {
 	int err;
-	char buffer[CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES] = {"\0"};
+	char buffer[CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES] = { "\0" };
 
 	printk("Transmitting UDP/IP payload of %d bytes to the ",
 	       CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES + UDP_IP_HEADER_SIZE);
 	printk("IP address %s, port number %d\n",
-	       CONFIG_UDP_SERVER_ADDRESS_STATIC,
-	       CONFIG_UDP_SERVER_PORT);
+	       CONFIG_UDP_SERVER_ADDRESS_STATIC, CONFIG_UDP_SERVER_PORT);
 
 	err = send(client_fd, buffer, sizeof(buffer), 0);
 	if (err < 0) {
@@ -35,8 +34,8 @@ static void server_transmission_work_fn(struct k_work *work)
 	}
 
 	k_delayed_work_submit(
-			&server_transmission_work,
-			K_SECONDS(CONFIG_UDP_DATA_UPLOAD_FREQUENCY_SECONDS));
+		&server_transmission_work,
+		K_SECONDS(CONFIG_UDP_DATA_UPLOAD_FREQUENCY_SECONDS));
 }
 
 static void work_init(void)
@@ -51,18 +50,19 @@ static void lte_handler(const struct lte_lc_evt *const evt)
 	switch (evt->type) {
 	case LTE_LC_EVT_NW_REG_STATUS:
 		if ((evt->nw_reg_status != LTE_LC_NW_REG_REGISTERED_HOME) &&
-		     (evt->nw_reg_status != LTE_LC_NW_REG_REGISTERED_ROAMING)) {
+		    (evt->nw_reg_status != LTE_LC_NW_REG_REGISTERED_ROAMING)) {
 			break;
 		}
 
 		printk("Network registration status: %s\n",
-			evt->nw_reg_status == LTE_LC_NW_REG_REGISTERED_HOME ?
-			"Connected - home network" : "Connected - roaming\n");
+		       evt->nw_reg_status == LTE_LC_NW_REG_REGISTERED_HOME ?
+			       "Connected - home network" :
+			       "Connected - roaming\n");
 		k_sem_give(&lte_connected);
 		break;
 	case LTE_LC_EVT_PSM_UPDATE:
 		printk("PSM parameter update: TAU: %d, Active time: %d\n",
-			evt->psm_cfg.tau, evt->psm_cfg.active_time);
+		       evt->psm_cfg.tau, evt->psm_cfg.active_time);
 		break;
 	case LTE_LC_EVT_EDRX_UPDATE: {
 		char log_buf[60];
@@ -78,8 +78,9 @@ static void lte_handler(const struct lte_lc_evt *const evt)
 	}
 	case LTE_LC_EVT_RRC_UPDATE:
 		printk("RRC mode: %s\n",
-			evt->rrc_mode == LTE_LC_RRC_MODE_CONNECTED ?
-			"Connected" : "Idle\n");
+		       evt->rrc_mode == LTE_LC_RRC_MODE_CONNECTED ?
+			       "Connected" :
+			       "Idle\n");
 		break;
 	case LTE_LC_EVT_CELL_UPDATE:
 		printk("LTE cell changed: Cell ID: %d, Tracking area: %d\n",
@@ -131,6 +132,24 @@ static int configure_low_power(void)
 	return err;
 }
 
+/*   new modem_configure with init and connect async, error on RAI request if default setup is CATM1 network. */
+
+int lte_lc_init_and_connect_async_new(lte_lc_evt_handler_t handler)
+{
+	int err;
+
+	err = lte_lc_init();
+	if (err) {
+		return err;
+	}
+	err = configure_low_power(); /* setup low power before connect */
+	if (err) {
+		printk("Unable to set low power configuration, error: %d\n",
+		       err);
+	}
+	return lte_lc_connect_async(handler);
+}
+
 static void modem_configure(void)
 {
 	int err;
@@ -138,7 +157,7 @@ static void modem_configure(void)
 	if (IS_ENABLED(CONFIG_LTE_AUTO_INIT_AND_CONNECT)) {
 		/* Do nothing, modem is already configured and LTE connected. */
 	} else {
-		err = lte_lc_init_and_connect_async(lte_handler);
+		err = lte_lc_init_and_connect_async_new(lte_handler);
 		if (err) {
 			printk("Modem configuration, error: %d\n", err);
 			return;
@@ -190,11 +209,10 @@ error:
 	return err;
 }
 
-
-void disable_uart()  // disable UART to measure current.
+void disable_uart() // disable UART to measure current.
 {
-      NRF_UARTE0->ENABLE = 0;
-      NRF_UARTE1->ENABLE = 0;
+	NRF_UARTE0->ENABLE = 0;
+	NRF_UARTE1->ENABLE = 0;
 }
 
 void main(void)
@@ -206,13 +224,8 @@ void main(void)
 	work_init();
 
 #if defined(CONFIG_BSD_LIBRARY)
-	err = configure_low_power();
-	if (err) {
-		printk("Unable to set low power configuration, error: %d\n",
-		       err);
-	}
 
-	modem_configure();
+	modem_configure(); /* move modem config before low power config, RAI won't work if the LTE network mode by default not NBIoT  */
 
 	k_sem_take(&lte_connected, K_FOREVER);
 #endif
@@ -228,7 +241,7 @@ void main(void)
 		printk("Not able to connect to UDP server\n");
 		return;
 	}
-	
+
 	k_delayed_work_submit(&server_transmission_work, K_NO_WAIT);
 	/* disable UART here to save power */
 

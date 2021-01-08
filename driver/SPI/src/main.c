@@ -14,7 +14,18 @@
 
 #include <drivers/spi.h>
 
-static const struct spi_config spi_cfg = {
+/* including 
+
+	const struct device	*gpio_dev;
+	uint32_t		delay;
+	gpio_pin_t		gpio_pin;
+	gpio_dt_flags_t		gpio_dt_flags;
+*/
+
+struct spi_cs_control cs_ctrl;
+
+
+static struct spi_config spi_cfg = {
 	.operation = SPI_WORD_SET(8) | SPI_TRANSFER_MSB |
 		     SPI_MODE_CPOL | SPI_MODE_CPHA,
 	.frequency = 4000000,
@@ -25,6 +36,17 @@ const struct device * spi_dev;
 
 static void spi_init(void)
 {
+
+	cs_ctrl.delay = 20U;
+	cs_ctrl.gpio_pin = 7;  /* px.07; GPIO_0 -> p0.07 */
+	cs_ctrl.gpio_dt_flags = GPIO_ACTIVE_LOW;
+	cs_ctrl.gpio_dev = device_get_binding("GPIO_0");
+
+	if (!cs_ctrl.gpio_dev) {
+		printk("Unable to get GPIO SPI CS device");
+		return ;
+	}
+	spi_cfg.cs = &cs_ctrl;
 	const char* const spiName = "SPI_1";
 	spi_dev = device_get_binding(spiName);
 

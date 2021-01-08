@@ -8,9 +8,15 @@
 
 */
 
+#define TEST_SPI_CS_EN 1
+#define SPI_CS_CFG_FROM_DTS 1
+
+#if SPI_CS_CFG_FROM_DTS
+#define DT_DRV_COMPAT cirrus_logic_cs47l63
+#endif
+
 #include <zephyr.h>
 #include <sys/printk.h>
-
 
 #include <drivers/spi.h>
 
@@ -22,32 +28,55 @@
 	gpio_dt_flags_t		gpio_dt_flags;
 */
 
+#if TEST_SPI_CS_EN
 struct spi_cs_control cs_ctrl;
-
+#endif
 
 static struct spi_config spi_cfg = {
-	.operation = SPI_WORD_SET(8) | SPI_TRANSFER_MSB |
-		     SPI_MODE_CPOL | SPI_MODE_CPHA,
+	.operation = SPI_WORD_SET(8) | SPI_TRANSFER_MSB | SPI_MODE_CPOL |
+		     SPI_MODE_CPHA,
 	.frequency = 4000000,
 	.slave = 0,
 };
 
-const struct device * spi_dev;
+const struct device *spi_dev;
 
 static void spi_init(void)
 {
-
-	cs_ctrl.delay = 20U;
-	cs_ctrl.gpio_pin = 7;  /* px.07; GPIO_0 -> p0.07 */
+#if TEST_SPI_CS_EN
+#if !SPI_CS_CFG_FROM_DTS
+	/* A quick dirty way to add CS to SPI Master to control slave CS  */
+	cs_ctrl.delay =
+		0U; /* us time setup CS before and after SPI activities   */
+	cs_ctrl.gpio_pin = 7; /* px.07; GPIO_0 -> p0.07 */
 	cs_ctrl.gpio_dt_flags = GPIO_ACTIVE_LOW;
 	cs_ctrl.gpio_dev = device_get_binding("GPIO_0");
 
 	if (!cs_ctrl.gpio_dev) {
 		printk("Unable to get GPIO SPI CS device");
-		return ;
+		return;
 	}
+#else
+
+/* require dts overlay includes the cs pin details, propery device driver setup.*/
+#if DT_INST_SPI_DEV_HAS_CS_GPIOS(0)
+	cs_ctrl.delay = 0U;
+	cs_ctrl.gpio_pin =
+		DT_INST_SPI_DEV_CS_GPIOS_PIN(0); /* px.07; GPIO_0 -> p0.07 */
+	cs_ctrl.gpio_dt_flags = DT_INST_SPI_DEV_CS_GPIOS_FLAGS(0);
+	cs_ctrl.gpio_dev =
+		device_get_binding(DT_INST_SPI_DEV_CS_GPIOS_LABEL(0));
+
+	if (!cs_ctrl.gpio_dev) {
+		printk("Unable to get GPIO SPI CS device");
+		return;
+	}
+
+#endif
+#endif
 	spi_cfg.cs = &cs_ctrl;
-	const char* const spiName = "SPI_1";
+#endif
+	const char *const spiName = "SPI_1";
 	spi_dev = device_get_binding(spiName);
 
 	if (spi_dev == NULL) {
@@ -62,23 +91,15 @@ void spi_test_send(void)
 	static uint8_t tx_buffer[1];
 	static uint8_t rx_buffer[1];
 
-	const struct spi_buf tx_buf = {
-		.buf = tx_buffer,
-		.len = sizeof(tx_buffer)
-	};
-	const struct spi_buf_set tx = {
-		.buffers = &tx_buf,
-		.count = 1
-	};
+	const struct spi_buf tx_buf = { .buf = tx_buffer,
+					.len = sizeof(tx_buffer) };
+	const struct spi_buf_set tx = { .buffers = &tx_buf, .count = 1 };
 
 	struct spi_buf rx_buf = {
 		.buf = rx_buffer,
 		.len = sizeof(rx_buffer),
 	};
-	const struct spi_buf_set rx = {
-		.buffers = &rx_buf,
-		.count = 1
-	};
+	const struct spi_buf_set rx = { .buffers = &rx_buf, .count = 1 };
 
 	err = spi_transceive(spi_dev, &spi_cfg, &tx, &rx);
 	if (err) {
@@ -88,7 +109,7 @@ void spi_test_send(void)
 		printk("TX sent: %x\n", tx_buffer[0]);
 		printk("RX recv: %x\n", rx_buffer[0]);
 		tx_buffer[0]++;
-	}	
+	}
 }
 
 void main(void)

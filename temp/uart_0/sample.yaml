@@ -1,0 +1,15 @@
+sample:
+  description: modified from hello world
+    application
+  name: <same as folder name>
+common:
+    tags: introduction
+    integration_platforms:
+      - native_posix
+    harness: console
+    harness_config:
+      type: one_line
+      regex:
+        - "Hello World! (.*)"
+tests:
+    tags: introduction

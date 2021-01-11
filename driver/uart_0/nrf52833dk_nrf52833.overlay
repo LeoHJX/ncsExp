@@ -1,0 +1,16 @@
+&uart0{
+    status = "okay";
+    label = "UART_0";
+    current-speed = < 0x1c200 >;
+    tx-pin = < 0x6 >;
+    rx-pin = < 0x8 >;
+    rts-pin = < 0x5 >;
+    cts-pin = < 0x7 >;
+};
+&uart1{
+    status = "disabled";
+    label = "UART_1";
+    current-speed = < 0x1c200 >;
+    rx-pin = < 0x21 >;
+    tx-pin = < 0x22 >;
+};

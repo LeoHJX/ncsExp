@@ -86,7 +86,7 @@ void blink0(void)
 #endif
 	};
 
-	blink(&led0, 100, 0);
+	blink(&led0, 2000, 0);
 }
 
 void blink1(void)
@@ -102,7 +102,7 @@ void blink1(void)
 #endif
 	};
 
-	blink(&led1, 1000, 1);
+	blink(&led1, 10000, 1);
 }
 
 void uart_out(void)

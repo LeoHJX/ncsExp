@@ -53,13 +53,15 @@
 	label = "UART_0";
 	compatible = "nordic,nrf-uart";
     current-speed = < 0x1c200 >;
-/*	tx-pin = < 0x6 >;
+	tx-pin = < 0x6 >;
     rx-pin = < 0x1 >;
-  */  /* un comments this for testing with DK */
+  /**/  /* un comments this for testing with DK */
 
  /*        use this with ozzard board */
- /*  	*/
+ /*  	
 	tx-pin = < 0x1F >;
-	rx-pin = < 0x2E >;
+	rx-pin = < 0x2C >; 
+	// rx-pin = < 0x2D >;
+	*/
 
 };

@@ -35,7 +35,18 @@ struct led {
 	unsigned int gpio_flags;
 };
 
-void blink(const struct led *led, uint32_t sleep_ms, uint32_t id)
+uint64_t loop_delay(void)
+{
+    volatile uint64_t x = 99999;
+    volatile uint64_t y = 0;
+    while(x > 1)
+    {
+        x--;
+        y=x;
+    }
+    return y + x;
+}
+void blink_led0(const struct led *led, uint32_t sleep_ms, uint32_t id)
 {
 	const struct device *gpio_dev;
 	int cnt = 0;
@@ -67,8 +78,51 @@ void blink(const struct led *led, uint32_t sleep_ms, uint32_t id)
 		memcpy(mem_ptr, &tx_data, size);
 
 		k_fifo_put(&printk_fifo, mem_ptr);
-
+        
 		k_msleep(sleep_ms);
+        /* example: call k_cpu_idle() in high prioritity could stop other tasks */
+        k_cpu_idle();
+        
+		cnt++;
+	}
+}
+
+
+void blink_led1(const struct led *led, uint32_t sleep_ms, uint32_t id)
+{
+	const struct device *gpio_dev;
+	int cnt = 0;
+	int ret;
+
+	gpio_dev = device_get_binding(led->gpio_dev_name);
+	if (gpio_dev == NULL) {
+		printk("Error: didn't find %s device\n",
+		       led->gpio_dev_name);
+		return;
+	}
+
+	ret = gpio_pin_configure(gpio_dev, led->gpio_pin, led->gpio_flags);
+	if (ret != 0) {
+		printk("Error %d: failed to configure pin %d '%s'\n",
+			ret, led->gpio_pin, led->gpio_pin_name);
+		return;
+	}
+
+	while (1) {
+		gpio_pin_set(gpio_dev, led->gpio_pin, cnt % 2);
+
+		struct printk_data_t tx_data = { .led = id, .cnt = cnt };
+
+		size_t size = sizeof(struct printk_data_t);
+		char *mem_ptr = k_malloc(size);
+		__ASSERT_NO_MSG(mem_ptr != 0);
+
+		memcpy(mem_ptr, &tx_data, size);
+
+		k_fifo_put(&printk_fifo, mem_ptr);
+        loop_delay();
+		k_msleep(sleep_ms);
+        
 		cnt++;
 	}
 }
@@ -85,8 +139,8 @@ void blink0(void)
 #error "Unsupported board: led0 devicetree alias is not defined"
 #endif
 	};
-
-	blink(&led0, 2000, 0);
+    k_msleep(2000);
+	blink_led0(&led0, 30, 0);
 }
 
 void blink1(void)
@@ -102,7 +156,7 @@ void blink1(void)
 #endif
 	};
 
-	blink(&led1, 10000, 1);
+	blink_led1(&led1, 100, 1);
 }
 
 void uart_out(void)
@@ -117,7 +171,7 @@ void uart_out(void)
 }
 
 K_THREAD_DEFINE(blink0_id, STACKSIZE, blink0, NULL, NULL, NULL,
-		PRIORITY, 0, 0);
+		PRIORITY-2, 0, 0);
 K_THREAD_DEFINE(blink1_id, STACKSIZE, blink1, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 K_THREAD_DEFINE(uart_out_id, STACKSIZE, uart_out, NULL, NULL, NULL,

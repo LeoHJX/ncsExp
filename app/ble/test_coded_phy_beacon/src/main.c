@@ -50,7 +50,7 @@ nRF52840 : -40, -20, -16, -12, -8, -4, 0, 4, 8
 
 */
 
-#define BLE_TX_POWER_LEVEL    (0)
+#define BLE_TX_POWER_LEVEL    (-4)
 
 static void set_tx_power(uint8_t handle_type, uint16_t handle, int8_t tx_pwr_lvl)
 {
@@ -166,7 +166,7 @@ void main(void)
 
 #if TX_POWER_CHANGE
         /* setup TX power */
-	set_tx_power(BT_HCI_VS_LL_HANDLE_TYPE_ADV, 0, BLE_TX_POWER_LEVEL);
+		set_tx_power(BT_HCI_VS_LL_HANDLE_TYPE_ADV, 0, BLE_TX_POWER_LEVEL);
 #endif
 	k_sleep(K_MSEC(100)); /* add some delay, before start */
 	while (1) {

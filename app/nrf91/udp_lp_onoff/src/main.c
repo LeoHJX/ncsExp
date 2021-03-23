@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <modem/lte_lc.h>
 #include <net/socket.h>
-
+#include <modem/at_cmd.h>
 #define UDP_IP_HEADER_SIZE 28
 
 static int client_fd;
@@ -63,7 +63,7 @@ static void lte_handler(const struct lte_lc_evt *const evt)
 		break;
 	}
 }
-
+#if !defined(CONFIG_UDP_ON_OFF_ENABLE) 
 static int configure_low_power(void)
 {
 	int err;
@@ -104,7 +104,7 @@ static int configure_low_power(void)
 
 	return err;
 }
-
+#endif /*#if defined(CONFIG_UDP_ON_OFF_ENABLE)  */
 /*   new modem_configure with init and connect async, error on RAI request if default setup is CATM1 network. */
 
 int lte_lc_init_and_connect_async_new(lte_lc_evt_handler_t handler)
@@ -166,6 +166,7 @@ static void modem_configure_onoff(void)
 }
 
 #endif
+#if !defined(CONFIG_UDP_ON_OFF_ENABLE) 
 static void modem_configure(void)
 {
 	int err;
@@ -180,6 +181,7 @@ static void modem_configure(void)
 		}
 	}
 }
+#endif /*  #if !defined(CONFIG_UDP_ON_OFF_ENABLE)   */
 #endif
 
 static void server_disconnect(void)
@@ -266,12 +268,12 @@ static void server_transmission_work_fn(struct k_work *work)
 		return;
 	}
 #if defined(CONFIG_UDP_ON_OFF_ENABLE) 
-    //lte_lc_deinit();
-    lte_lc_offline();
-    //lte_lc_power_off();
+
+    lte_lc_offline(); 
+    /*lte_lc_power_off(); */
 #endif 
     server_disconnect();
-    //lte_lc_cereg_setup_onoff();
+    /* lte_lc_cereg_setup_onoff(); */   /* Have to enable this line if use CFUN=0 instead of CFUN=4.  */
 
 	k_delayed_work_submit(
 		&server_transmission_work,
@@ -291,8 +293,9 @@ void disable_uart() // disable UART to measure current.
 
 void main(void)
 {
+#if !defined(CONFIG_UDP_ON_OFF_ENABLE) 
 	int err;
-
+#endif
 	printk("UDP sample has started\n");
 
 	work_init();

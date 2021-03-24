@@ -34,15 +34,18 @@ If you want to view the debug messages, follow the procedure in :ref:`testing_rt
 Requirements
 ************
 
-* One of the following development boards:
+The sample supports the following development kits:
 
-  * |nRF5340DK|
-  * |nRF52840DK|
-  * |nRF52DK|
+.. table-from-rows:: /includes/sample_board_rows.txt
+   :header: heading
+   :rows: nrf5340dk_nrf5340_cpuapp_and_cpuappns, nrf52840dk_nrf52840, nrf52840dk_nrf52811, nrf52833dk_nrf52833, nrf52833dk_nrf52820, nrf52833dk_nrf52820, nrf52dk_nrf52832, nrf52dk_nrf52810
 
-* A phone or tablet running a compatible application. The `Testing`_ instructions refer to nRF Connect for Mobile, but similar applications (for example, nRF Toolbox) can be used as well.
 
-  You can also test the application with the :ref:`central_uart` sample. See the documentation for that sample for detailed instructions.
+The sample also requires a phone or tablet running a compatible application.
+The `Testing`_ instructions refer to nRF Connect for Mobile, but similar applications (for example, nRF Toolbox) can be used as well.
+
+You can also test the application with the :ref:`central_uart` sample.
+See the documentation for that sample for detailed instructions.
 
 User interface
 **************
@@ -66,17 +69,26 @@ Building and running
 
 .. include:: /includes/build_and_run.txt
 
+Minimal build
+=============
+
+You can build the sample with a minimum configuration as a demonstration of how to reduce code size and RAM usage.
+
+.. code-block:: console
+
+   west build samples/bluetooth/peripheral_uart -- -DCONF_FILE='prj_minimal.conf'
+
 .. _peripheral_uart_testing:
 
 Testing
 =======
 
-After programming the sample to your board, test it by performing the following steps:
+After programming the sample to your development kit, test it by performing the following steps:
 
-1. Connect the board to the computer using a USB cable. The board is assigned a COM port (Windows) or ttyACM device (Linux), which is visible in the Device Manager.
+1. Connect the kit to the computer using a USB cable. The kit is assigned a COM port (Windows) or ttyACM device (Linux), which is visible in the Device Manager.
 #. |connect_terminal|
 #. Optionally, connect the RTT console to display debug messages. See :ref:`peripheral_uart_debug`.
-#. Reset the board.
+#. Reset the kit.
 #. Observe that LED 1 is blinking and that the device is advertising with the device name that is configured in :option:`CONFIG_BT_DEVICE_NAME`.
 #. Observe that the text "Starting Nordic UART service example" is printed on the COM listener running on the computer.
 #. Connect to the device using nRF Connect for Mobile.

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2018 Nordic Semiconductor ASA
  *
- * SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
 /** @file
@@ -12,6 +12,8 @@
 #include <zephyr.h>
 #include <drivers/uart.h>
 
+#include <sys/byteorder.h>
+
 #include <device.h>
 #include <soc.h>
 
@@ -19,6 +21,7 @@
 #include <bluetooth/uuid.h>
 #include <bluetooth/gatt.h>
 #include <bluetooth/hci.h>
+#include <bluetooth/hci_vs.h>
 
 #include <bluetooth/services/nus.h>
 
@@ -27,6 +30,7 @@
 #include <settings/settings.h>
 
 #include <stdio.h>
+
 #include <logging/log.h>
 
 #define LOG_MODULE_NAME peripheral_uart
@@ -49,6 +53,55 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #define UART_BUF_SIZE CONFIG_BT_NUS_UART_BUFFER_SIZE
 #define UART_WAIT_FOR_BUF_DELAY K_MSEC(50)
 #define UART_WAIT_FOR_RX CONFIG_BT_NUS_UART_RX_WAIT_TIME
+
+#define TX_POWER_CHANGE 0
+
+#if TX_POWER_CHANGE
+/* TX power list
+nRF52832 : -40, -20, -16, -12, -8, -4, 0, 4 
+nRF52810 : -40, -20, -16, -12, -8, -4, 0, 4 
+nRF52840 : -40, -20, -16, -12, -8, -4, 0, 4, 8 
+
+*/
+
+#define BLE_TX_POWER_LEVEL    (4)
+
+static void set_tx_power(uint8_t handle_type, uint16_t handle, int8_t tx_pwr_lvl)
+{
+	struct bt_hci_cp_vs_write_tx_power_level *cp;
+	struct bt_hci_rp_vs_write_tx_power_level *rp;
+	struct net_buf *buf, *rsp = NULL;
+	int err;
+
+	buf = bt_hci_cmd_create(BT_HCI_OP_VS_WRITE_TX_POWER_LEVEL,
+				sizeof(*cp));
+	if (!buf) {
+		printk("Unable to allocate command buffer\n");
+		return;
+	}
+
+	cp = net_buf_add(buf, sizeof(*cp));
+	cp->handle = sys_cpu_to_le16(handle);
+	cp->handle_type = handle_type;
+	cp->tx_power_level = tx_pwr_lvl;
+
+	err = bt_hci_cmd_send_sync(BT_HCI_OP_VS_WRITE_TX_POWER_LEVEL,
+				   buf, &rsp);
+	if (err) {
+		uint8_t reason = rsp ?
+			((struct bt_hci_rp_vs_write_tx_power_level *)
+			  rsp->data)->status : 0;
+		printk("Set Tx power err: %d reason 0x%02x\n", err, reason);
+		return;
+	}
+
+	rp = (void *)rsp->data;
+	printk("Actual Tx Power: %d\n", rp->selected_tx_power);
+
+	net_buf_unref(rsp);
+}
+
+#endif
 
 static K_SEM_DEFINE(ble_init_ok, 0, 1);
 
@@ -453,13 +506,15 @@ void button_changed(uint32_t button_state, uint32_t has_changed)
 {
 	uint32_t buttons = button_state & has_changed;
 
-	if (auth_conn) {
-		if (buttons & KEY_PASSKEY_ACCEPT) {
-			num_comp_reply(true);
+	if (1 /* auth_conn */ ) {  /* comment out for other debugging purpose */
+ 		if (buttons & KEY_PASSKEY_ACCEPT) {  // button 1;
+            dk_set_led_on(3);
+			//num_comp_reply(true);
 		}
 
-		if (buttons & KEY_PASSKEY_REJECT) {
-			num_comp_reply(false);
+		if (buttons & KEY_PASSKEY_REJECT) {  // button 2;
+            dk_set_led_off(3);
+			//num_comp_reply(false);
 		}
 	}
 }
@@ -509,12 +564,16 @@ void main(void)
 	if (IS_ENABLED(CONFIG_SETTINGS)) {
 		settings_load();
 	}
+
 	err = bt_nus_init(&nus_cb);
 	if (err) {
 		LOG_ERR("Failed to initialize UART service (err: %d)", err);
 		return;
 	}
-
+#if TX_POWER_CHANGE
+        /* setup TX power */
+	set_tx_power(BT_HCI_VS_LL_HANDLE_TYPE_ADV, 0, BLE_TX_POWER_LEVEL);
+#endif
 	err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), sd,
 			      ARRAY_SIZE(sd));
 	if (err) {

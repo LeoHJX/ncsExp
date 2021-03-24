@@ -36,6 +36,22 @@ config UDP_ON_OFF_ENABLE
 	bool "Enable LTE ON OFF between data transmitting, no PSM, eDRX used if this enabled"
 	default n
 
+config USE_CFUN_0_OFF
+	bool "Use CFUN=0 to switch off modem, otherwise CFUN=4 used"
+	default n
+
+config RECEIVE_UDP_PACKETS
+	bool "Receve UDP return packets if enabled."
+	default n
+
+config TEST_USE_TCP
+	bool "use TCP instead of UDP for testing."
+	default n
+
+config UDP_RECV_TIMEOUT_SECONDS
+	int "timeout for UDP receiving"
+	default 2
+
 endmenu
 
 module = UDP

@@ -7,8 +7,10 @@
 #include <zephyr.h>
 #include <stdio.h>
 #include <modem/lte_lc.h>
+#include <nrf_socket.h>
 #include <net/socket.h>
 #include <modem/at_cmd.h>
+
 #define UDP_IP_HEADER_SIZE 28
 
 static int client_fd;
@@ -63,48 +65,7 @@ static void lte_handler(const struct lte_lc_evt *const evt)
 		break;
 	}
 }
-#if !defined(CONFIG_UDP_ON_OFF_ENABLE) 
-static int configure_low_power(void)
-{
-	int err;
 
-#if defined(CONFIG_UDP_PSM_ENABLE)
-	/** Power Saving Mode */
-	err = lte_lc_psm_req(true);
-	if (err) {
-		printk("lte_lc_psm_req, error: %d\n", err);
-	}
-#else
-	err = lte_lc_psm_req(false);
-	if (err) {
-		printk("lte_lc_psm_req, error: %d\n", err);
-	}
-#endif
-
-#if defined(CONFIG_UDP_EDRX_ENABLE)
-	/** enhanced Discontinuous Reception */
-	err = lte_lc_edrx_req(true);
-	if (err) {
-		printk("lte_lc_edrx_req, error: %d\n", err);
-	}
-#else
-	err = lte_lc_edrx_req(false);
-	if (err) {
-		printk("lte_lc_edrx_req, error: %d\n", err);
-	}
-#endif
-
-#if defined(CONFIG_UDP_RAI_ENABLE)
-	/** Release Assistance Indication  */
-	err = lte_lc_rai_req(true);
-	if (err) {
-		printk("lte_lc_rai_req, error: %d\n", err);
-	}
-#endif
-
-	return err;
-}
-#endif /*#if defined(CONFIG_UDP_ON_OFF_ENABLE)  */
 /*   new modem_configure with init and connect async, error on RAI request if default setup is CATM1 network. */
 
 int lte_lc_init_and_connect_async_new(lte_lc_evt_handler_t handler)
@@ -115,13 +76,7 @@ int lte_lc_init_and_connect_async_new(lte_lc_evt_handler_t handler)
 	if (err) {
 		return err;
 	}
-#if !defined(CONFIG_UDP_ON_OFF_ENABLE) 
-	err = configure_low_power(); /* setup low power before connect */
-	if (err) {
-		printk("Unable to set low power configuration, error: %d\n",
-		       err);
-	}
-#endif
+
 	return lte_lc_connect_async(handler);
 }
 
@@ -134,13 +89,6 @@ int lte_lc_init_and_connect_async_onoff(void)
 	if (err) {
 		return err;
 	}
-#if !defined(CONFIG_UDP_ON_OFF_ENABLE) 
-	err = configure_low_power(); /* setup low power before connect */
-	if (err) {
-		printk("Unable to set low power configuration, error: %d\n",
-		       err);
-	}
-#endif
     return err;
 	
 }
@@ -165,24 +113,8 @@ static void modem_configure_onoff(void)
 	}
 }
 
-#endif
-#if !defined(CONFIG_UDP_ON_OFF_ENABLE) 
-static void modem_configure(void)
-{
-	int err;
-
-	if (IS_ENABLED(CONFIG_LTE_AUTO_INIT_AND_CONNECT)) {
-		/* Do nothing, modem is already configured and LTE connected. */
-	} else {
-		err = lte_lc_init_and_connect_async_new(lte_handler);
-		if (err) {
-			printk("Modem configuration, error: %d\n", err);
-			return;
-		}
-	}
-}
-#endif /*  #if !defined(CONFIG_UDP_ON_OFF_ENABLE)   */
-#endif
+#endif /* #if defined(CONFIG_UDP_ON_OFF_ENABLE)   */
+#endif /* #if defined(CONFIG_BSD_LIBRARY)  */
 
 static void server_disconnect(void)
 {
@@ -205,13 +137,31 @@ static int server_init(void)
 static int server_connect(void)
 {
 	int err;
-
-	client_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+#if defined(CONFIG_TEST_USE_TCP)
+	client_fd = socket(AF_INET, SOCK_STREAM /* SOCK_DGRAM */, IPPROTO_TCP /* IPPROTO_UDP*/);
+#else
+	client_fd = socket(AF_INET,  SOCK_DGRAM , IPPROTO_UDP);
+#endif
 	if (client_fd < 0) {
 		printk("Failed to create UDP socket: %d\n", errno);
 		goto error;
 	}
+#if defined(CONFIG_UDP_RECV_TIMEOUT_SECONDS)
+	struct timeval timeout = {
+		.tv_sec = CONFIG_UDP_RECV_TIMEOUT_SECONDS,
+		.tv_usec = 0,
+	};
 
+	err = setsockopt(client_fd,
+			 NRF_SOL_SOCKET,
+			 NRF_SO_RCVTIMEO,
+			 &timeout,
+			 sizeof(timeout));
+	if (err) {
+		printk("Failed to setup socket timeout, errno %d\n", errno);
+		/* do not return */ /* return -1; */
+	}
+#endif
 	err = connect(client_fd, (struct sockaddr *)&host_addr,
 		      sizeof(struct sockaddr_in));
 	if (err < 0) {
@@ -227,6 +177,7 @@ error:
 	return err;
 }
 
+/*  setup CEREG=5 for URC, only require this fun call if CFUN=0 used to switch modem off */
 int lte_lc_cereg_setup_onoff(void)
 {
 	if (at_cmd_write("AT+CEREG=5", NULL, 0, NULL) != 0) {
@@ -235,10 +186,22 @@ int lte_lc_cereg_setup_onoff(void)
 	return 0;
 }
 
+
 static void server_transmission_work_fn(struct k_work *work)
 {
 	int err;
-	char buffer[CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES] = { "\0" };
+    static uint32_t cnt;
+
+	char buffer[CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES + 8] = {"#"}; /* reserve data at the end of the buffer */
+
+    memset(buffer, '#', CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES);
+#if defined(CONFIG_RECEIVE_UDP_PACKETS)
+    cnt=0;
+    sprintf(buffer, "pkg:%d ", cnt);  /* fixed packets for server to check and reply.  */
+#else
+    sprintf(buffer, "pkg:%d ", cnt++);
+#endif
+    
 
 #if defined(CONFIG_UDP_ON_OFF_ENABLE) 
 
@@ -249,12 +212,14 @@ static void server_transmission_work_fn(struct k_work *work)
 	err = server_init();
 	if (err) {
 		printk("Not able to initialize UDP server connection\n");
-		return;
+        goto workerror;
+		/* return; */ /* do not return */
 	}
 	err = server_connect();
 	if (err) {
 		printk("Not able to connect to UDP server\n");
-		return;
+        goto workerror;
+		/* return; */ /* do not return */
 	}
 #endif
 	printk("Transmitting UDP/IP payload of %d bytes to the ",
@@ -262,19 +227,43 @@ static void server_transmission_work_fn(struct k_work *work)
 	printk("IP address %s, port number %d\n",
 	       CONFIG_UDP_SERVER_ADDRESS_STATIC, CONFIG_UDP_SERVER_PORT);
 
-	err = send(client_fd, buffer, sizeof(buffer), 0);
+	err = send(client_fd, buffer, CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES, 0);
 	if (err < 0) {
 		printk("Failed to transmit UDP packet, %d\n", errno);
-		return;
+        goto workerror;
+		/* return; */ /* do not return */
 	}
+#if defined(CONFIG_RECEIVE_UDP_PACKETS)
+
+    memset(buffer, 0, sizeof(buffer));
+
+	err = recv(client_fd, buffer, CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES, 0);
+	if (err < 0) {
+		printk("Failed to receive UDP packet, %d\n", errno);
+        goto workerror;
+		/* return; */ /* do not return */
+	}  
+    printk("recv: %s\n", buffer);
+
+#endif
+
+workerror:
+
+    server_disconnect();
 #if defined(CONFIG_UDP_ON_OFF_ENABLE) 
 
-    lte_lc_offline(); 
-    /*lte_lc_power_off(); */
+#if defined(CONFIG_USE_CFUN_0_OFF)
+	lte_lc_power_off(); 
+#else
+	lte_lc_offline();
+#endif
+     
 #endif 
-    server_disconnect();
-    /* lte_lc_cereg_setup_onoff(); */   /* Have to enable this line if use CFUN=0 instead of CFUN=4.  */
+    
 
+#if defined(CONFIG_USE_CFUN_0_OFF)	
+    lte_lc_cereg_setup_onoff();   /**/   /* Have to enable this line if use CFUN=0 instead of CFUN=4.  */
+#endif
 	k_delayed_work_submit(
 		&server_transmission_work,
 		K_SECONDS(CONFIG_UDP_DATA_UPLOAD_FREQUENCY_SECONDS));
@@ -285,7 +274,7 @@ static void work_init(void)
 	k_delayed_work_init(&server_transmission_work,
 			    server_transmission_work_fn);
 }
-void disable_uart() // disable UART to measure current.
+void disable_uart() /* disable UART to measure current. use this one if CONFIG_SERIAL=n doens't work */
 {
 	NRF_UARTE0->ENABLE = 0;
 	NRF_UARTE1->ENABLE = 0;
@@ -293,40 +282,15 @@ void disable_uart() // disable UART to measure current.
 
 void main(void)
 {
-#if !defined(CONFIG_UDP_ON_OFF_ENABLE) 
-	int err;
-#endif
 	printk("UDP sample has started\n");
 
 	work_init();
 
 #if defined(CONFIG_UDP_ON_OFF_ENABLE) 
     modem_configure_onoff();
-
-#else
-#if defined(CONFIG_BSD_LIBRARY)
-
-	modem_configure(); /* move modem config before low power config, RAI won't work if the LTE network mode by default not NBIoT  */
-
-	k_sem_take(&lte_connected, K_FOREVER);
-#endif
-
-
-
-	err = server_init();
-	if (err) {
-		printk("Not able to initialize UDP server connection\n");
-		return;
-	}
-
-	err = server_connect();
-	if (err) {
-		printk("Not able to connect to UDP server\n");
-		return;
-	}
 #endif
 	k_delayed_work_submit(&server_transmission_work, K_NO_WAIT);
-	/* disable UART here to save power */
 
-	//disable_uart();
+	/* no need for now,  disable UART here to save power */
+	/*  disable_uart();  */ 
 }

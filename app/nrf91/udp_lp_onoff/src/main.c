@@ -13,6 +13,8 @@
 
 #define UDP_IP_HEADER_SIZE 28
 
+#define EACH_MAX_TCP_PACKET      1024
+
 static int client_fd;
 static struct sockaddr_storage host_addr;
 static struct k_delayed_work server_transmission_work;
@@ -153,8 +155,8 @@ static int server_connect(void)
 	};
 
 	err = setsockopt(client_fd,
-			 NRF_SOL_SOCKET,
-			 NRF_SO_RCVTIMEO,
+			 SOL_SOCKET,
+			 SO_RCVTIMEO,
 			 &timeout,
 			 sizeof(timeout));
 	if (err) {
@@ -191,10 +193,13 @@ static void server_transmission_work_fn(struct k_work *work)
 {
 	int err;
     static uint32_t cnt;
+    int32_t packets_to_send = CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES;
 
 	char buffer[CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES + 8] = {"#"}; /* reserve data at the end of the buffer */
 
     memset(buffer, '#', CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES);
+    buffer[CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES-1] = '*';
+    buffer[CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES-2] = '*';
 #if defined(CONFIG_RECEIVE_UDP_PACKETS)
     cnt=0;
     sprintf(buffer, "pkg:%d ", cnt);  /* fixed packets for server to check and reply.  */
@@ -226,13 +231,23 @@ static void server_transmission_work_fn(struct k_work *work)
 	       CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES + UDP_IP_HEADER_SIZE);
 	printk("IP address %s, port number %d\n",
 	       CONFIG_UDP_SERVER_ADDRESS_STATIC, CONFIG_UDP_SERVER_PORT);
+    
 
-	err = send(client_fd, buffer, CONFIG_UDP_DATA_UPLOAD_SIZE_BYTES, 0);
-	if (err < 0) {
-		printk("Failed to transmit UDP packet, %d\n", errno);
-        goto workerror;
-		/* return; */ /* do not return */
-	}
+    int32_t pkg_sent = 0;
+    while( packets_to_send > 0)
+    {   
+        int32_t pkg_out = ((packets_to_send > EACH_MAX_TCP_PACKET)? EACH_MAX_TCP_PACKET: packets_to_send);
+        err = send(client_fd, &buffer[pkg_sent], pkg_out, 0);
+        printk("package send :%d\n", err);
+        if (err < 0) {
+            printk("Failed to transmit UDP packet, %d\n", errno);
+            goto workerror;
+            /* return; */ /* do not return */
+        } 
+        pkg_sent += pkg_out;
+        packets_to_send = packets_to_send - pkg_out;
+    }
+
 #if defined(CONFIG_RECEIVE_UDP_PACKETS)
 
     memset(buffer, 0, sizeof(buffer));

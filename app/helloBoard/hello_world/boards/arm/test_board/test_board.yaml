@@ -1,0 +1,17 @@
+identifier: test_board
+name: test_board
+type: mcu
+arch: arm
+toolchain:
+  - gnuarmemb
+  - xtools
+  - zephyr
+ram: 64
+flash: 256
+supported:
+  - gpio
+  - i2c
+  - pwm
+  - spi
+  - watchdog
+  - counter

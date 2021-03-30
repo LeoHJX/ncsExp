@@ -1,0 +1,14 @@
+# test_board NRF9160 board configuration
+
+# Copyright (c) 2018-2020 Nordic Semiconductor ASA
+# SPDX-License-Identifier: Apache-2.0
+
+if SOC_NRF9160_SICA
+
+config BOARD_TEST_BOARD
+	bool "test_board"
+
+config BOARD_TEST_BOARDNS
+	bool "test_board non-secure"
+
+endif # SOC_NRF9160_SICA

@@ -1,0 +1,3 @@
+mmv '*hello_board*' '#1test_board#2'
+sed -i 's/hello_board/test_board/g' ./*
+sed -i 's/HELLO_BOARD/TEST_BOARD/g' ./*

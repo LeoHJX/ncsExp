@@ -35,7 +35,7 @@
 #define PIN DT_GPIO_PIN(LED0_NODE, gpios)
 #define FLAGS DT_GPIO_FLAGS(LED0_NODE, gpios)
 
-#define ADV_MF_DATA_LEN 16 /* make sure not overfill .  */
+#define ADV_MF_DATA_LEN 50 /* make sure not overfill .  */
 #define MANUFACTURE_ID 0x0059
 
 #define ADV_DATA_FIXED 0

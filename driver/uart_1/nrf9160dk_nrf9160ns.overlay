@@ -1,0 +1,20 @@
+
+&uart0{
+
+    status = "okay";
+    current-speed = < 0x1c200 >;
+    tx-pin = < 0x1 >;
+    rx-pin = < 0x0 >;
+    //rts-pin = < 0x1b >;
+    //cts-pin = < 0x1a >;
+};
+
+&uart1{
+
+    status = "okay";
+    current-speed = < 0x1c200 >;
+    tx-pin = < 0x1d >;
+    rx-pin = < 0x1c >;
+    //rts-pin = < 0x1b >;
+    //cts-pin = < 0x1a >;
+};

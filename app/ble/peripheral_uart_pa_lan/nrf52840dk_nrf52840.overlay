@@ -1,0 +1,7 @@
+/ {
+    nrf_radio_fem: pa_lna {
+        compatible = "skyworks,sky66112-11", "generic-fem-two-ctrl-pins";
+        ctx-gpios = <&gpio0 28 GPIO_ACTIVE_HIGH>;
+        crx-gpios = <&gpio0 29 GPIO_ACTIVE_HIGH>;
+    };
+};

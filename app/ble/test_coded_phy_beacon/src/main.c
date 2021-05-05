@@ -50,7 +50,7 @@ nRF52840 : -40, -20, -16, -12, -8, -4, 0, 4, 8
 
 */
 
-#define BLE_TX_POWER_LEVEL    (-4)
+#define BLE_TX_POWER_LEVEL    (4)
 
 static void set_tx_power(uint8_t handle_type, uint16_t handle, int8_t tx_pwr_lvl)
 {

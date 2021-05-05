@@ -31,13 +31,13 @@ static const struct bt_data ad[] = {
 
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
-#define DEVICE_BEACON_TXPOWER_NUM  8
+#define DEVICE_BEACON_TXPOWER_NUM  9
 
 static struct k_thread pwr_thread_data;
-static K_THREAD_STACK_DEFINE(pwr_thread_stack, 320);
+static K_THREAD_STACK_DEFINE(pwr_thread_stack, 512);
 
-static const int8_t txp[DEVICE_BEACON_TXPOWER_NUM] = {4, 0, -3, -8,
-						    -15, -18, -23, -30};
+static const int8_t txp[DEVICE_BEACON_TXPOWER_NUM] = {8, 4, 0, -4, -8,
+						    -12, -16, -20, -40};
 static const struct bt_le_adv_param *param =
 	BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_USE_NAME,
 			0x0020, 0x0020, NULL);
@@ -256,12 +256,16 @@ void modulate_tx_power(void *p1, void *p2, void *p3)
 			read_conn_rssi(default_conn_handle, &rssi);
 			printk("Connected (%d) - RSSI = %d\n",
 			       default_conn_handle, rssi);
-			if (rssi > -70) {
+			if (rssi > -50) {
 				txp_adaptive = -20;
-			} else if (rssi > -90) {
-				txp_adaptive = -12;
-			} else {
-				txp_adaptive = -4;
+			} else if (rssi > -60) {
+				txp_adaptive = 0;
+			} else if (rssi > -70) {
+				txp_adaptive = 4;
+            } else if (rssi > -80) {
+                    txp_adaptive = 8;
+            } else {
+            txp_adaptive = 8;
 			}
 			printk("Adaptive Tx power selected = %d\n",
 			       txp_adaptive);

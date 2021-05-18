@@ -1,0 +1,115 @@
+*** Booting Zephyr OS build v2.4.99-ncs2  ***
+I: Starting bootloader
+I: Primary image: magic=unset, swap_type=0x1, copy_done=0x3, image_ok=0x3
+I: Secondary image: magic=unset, swap_type=0x1, copy_done=0x3, image_ok=0x3
+I: Boot source: none
+= secondary slot in External Flash 0 = Ext vtable 10000200, reset addr 104f1 I: Swap type: none
+I: Bootloader chainload address offset: 0xc000
+I: Jumping to the first image slot
+I: pcd_lock_ram
+[00:00:00.261,169] <inf> rp_ll_api: Handshake done
+*** Booting Zephyr OS build v2.4.99-ncs2  ***
+
+[00:00:00.261,718] <inf> main: ### comprensive examples @ appcore version v0.1 compiled at 09:53:40 May  1 2021
+
+[00:00:00.261,871] <inf> main: ## OTA/Serial DFU example ##
+[00:00:00.261,871] <wrn> main: exit main thread
+
+**RPC usage example
+
+**I2C master example working with nRF5_SDK\examples\peripheral\twi_master_with_twis_slave directly
+
+**External interrupt example at P0.6
+
+[00:00:00.262,145] <inf> spi_thread: **SPI master example working with nRF5_SDK\examples\peripheral\spis directly
+[00:00:00.262,176] <inf> uart_thread: **high speed UART example
+[00:00:00.262,237] <inf> adc_thread: **ADC sampling example
+[00:00:00.262,268] <inf> adc_thread: ADC thread
+[00:00:00.262,420] <inf> adc_thread: Voltage0: 3009 mV / 3424
+[00:00:00.262,420] <inf> adc_thread: Voltage1: 547 mV / 623
+[00:00:30.262,481] <inf> adc_thread: ADC thread
+[00:00:30.262,573] <inf> adc_thread: Voltage0: 3010 mV / 3425
+[00:00:30.262,573] <inf> adc_thread: Voltage1: 227 mV / 259
+[00:00:30.272,399] <inf> adc_thread: Voltage0: 3010 mV / 3425 async
+[00:00:30.272,430] <inf> adc_thread: Voltage1: 227 mV / 259 async
+[00:01:00.262,634] <inf> adc_thread: ADC thread
+[00:01:00.262,725] <inf> adc_thread: Voltage0: 3010 mV / 3425
+[00:01:00.262,725] <inf> adc_thread: Voltage1: 239 mV / 272
+[00:01:05.394,897] <inf> mcuboot_util: Swap type: none
+[00:01:05.395,721] <inf> mcuboot_util: Swap type: none
+[00:01:05.546,936] <inf> mcuboot_util: Swap type: none
+[00:01:05.547,515] <inf> mcuboot_util: Swap type: none
+**nor erase add=0, size=106496 **[00:01:06.354,095] <inf> mcumgr_flash_mgmt: Erased 0x1a000 bytes of image slot
+**nor erase add=ef000, size=4096 **[00:01:06.391,296] <inf> mcumgr_flash_mgmt: Erased 0x1000 bytes of image slot trailer
+[00:01:30.262,786] <inf> adc_thread: ADC thread
+[00:01:30.262,878] <inf> adc_thread: Voltage0: 3005 mV / 3420
+[00:01:30.262,878] <inf> adc_thread: Voltage1: 232 mV / 264
+[00:01:30.272,583] <inf> adc_thread: Voltage0: 3005 mV / 3420 async
+[00:01:30.272,613] <inf> adc_thread: Voltage1: 232 mV / 264 async
+[00:02:00.262,939] <inf> adc_thread: ADC thread
+[00:02:00.263,031] <inf> adc_thread: Voltage0: 3011 mV / 3426
+[00:02:00.263,031] <inf> adc_thread: Voltage1: 238 mV / 271
+*** Booting Zephyr OS build v2.4.99-ncs2  ***
+I: Starting bootloader
+I: Primary image: magic=unset, swap_type=0x1, copy_done=0x3, image_ok=0x3
+I: Secondary image: magic=good, swap_type=0x2, copy_done=0x3, image_ok=0x3
+I: Boot source: none
+= secondary slot in External Flash 0 = Ext vtable 10000200, reset addr 10481 I: Swap type: test
+I: erasing trailer; fa_id=3 dev_name=NRF_FLASH_DRV_NAME
+fa size=f0000, offset=c000 fap id =3 fa_id_primary =3 fa_id_secondary=1**Internal erase addr=fb000, size=1000 **sz=4096 total_sz=4096 trailer_sz=2928 off=ef000I: erasing trailer; fa_id=1 dev_name=MX25R64
+fa size=f0000, offset=0 fap id =1 fa_id_primary =3 fa_id_secondary=1**nor erase add=ef000, size=4096 **sz=4096 total_sz=4096 trailer_sz=2928 off=ef000**Internal erase addr=26000, size=1000 ****Internal erase addr=25000, size=1000 ****Internal erase addr=24000, size=1000 ****Internal erase addr=23000, size=1000 ****Internal erase addr=22000, size=1000 ****Internal erase addr=21000, size=1000 ****Internal erase addr=20000, size=1000 ****Internal erase addr=1f000, size=1000 ****Internal erase addr=1e000, size=1000 ****Internal erase addr=1d000, size=1000 ****Internal erase addr=1c000, size=1000 ****Internal erase addr=1b000, size=1000 ****Internal erase addr=1a000, size=1000 ****Internal erase addr=19000, size=1000 ****Internal erase addr=18000, size=1000 ****Internal erase addr=17000, size=1000 ****Internal erase addr=16000, size=1000 ****Internal erase addr=15000, size=1000 ****Internal erase addr=14000, size=1000 ****Internal erase addr=13000, size=1000 ****Internal erase addr=12000, size=1000 ****Internal erase addr=11000, size=1000 ****Internal erase addr=10000, size=1000 ****Internal erase addr=f000, size=1000 ****Internal erase addr=e000, size=1000 ****Internal erase addr=d000, size=1000 ****Internal erase addr=c000, size=1000 ****nor erase add=0, size=4096 ****Internal erase addr=d000, size=1000 ****nor erase add=1000, size=4096 ****Internal erase addr=e000, size=1000 ****nor erase add=2000, size=4096 ****Internal erase addr=f000, size=1000 ****nor erase add=3000, size=4096 ****Internal erase addr=10000, size=1000 ****nor erase add=4000, size=4096 ****Internal erase addr=11000, size=1000 ****nor erase add=5000, size=4096 ****Internal erase addr=12000, size=1000 ****nor erase add=6000, size=4096 ****Internal erase addr=13000, size=1000 ****nor erase add=7000, size=4096 ****Internal erase addr=14000, size=1000 ****nor erase add=8000, size=4096 ****Internal erase addr=15000, size=1000 ****nor erase add=9000, size=4096 ****Internal erase addr=16000, size=1000 ****nor erase add=a000, size=4096 ****Internal erase addr=17000, size=1000 ****nor erase add=b000, size=4096 ****Internal erase addr=18000, size=1000 ****nor erase add=c000, size=4096 ****Internal erase addr=19000, size=1000 ****nor erase add=d000, size=4096 ****Internal erase addr=1a000, size=1000 ****nor erase add=e000, size=4096 ****Internal erase addr=1b000, size=1000 ****nor erase add=f000, size=4096 ****Internal erase addr=1c000, size=1000 ****nor erase add=10000, size=4096 ****Internal erase addr=1d000, size=1000 ****nor erase add=11000, size=4096 ****Internal erase addr=1e000, size=1000 ****nor erase add=12000, size=4096 ****Internal erase addr=1f000, size=1000 ****nor erase add=13000, size=4096 ****Internal erase addr=20000, size=1000 ****nor erase add=14000, size=4096 ****Internal erase addr=21000, size=1000 ****nor erase add=15000, size=4096 ****Internal erase addr=22000, size=1000 ****nor erase add=16000, size=4096 ****Internal erase addr=23000, size=1000 ****nor erase add=17000, size=4096 ****Internal erase addr=24000, size=1000 ****nor erase add=18000, size=4096 ****Internal erase addr=25000, size=1000 ****nor erase add=19000, size=4096 **I: Bootloader chainload address offset: 0xc000
+I: Jumping to the first image slot
+I: pcd_lock_ram
+[00:00:00.009,002] <inf> rp_ll_api: Handshake done
+*** Booting Zephyr OS build v2.4.99-ncs2  ***
+
+[00:00:00.009,521] <inf> main: ### New comprensive examples @ appcore version v0.1 compiled at 17:05:16 Apr 30 2021
+
+[00:00:00.009,674] <inf> main: ## OTA/Serial DFU example ##
+[00:00:00.009,704] <wrn> main: exit main thread
+
+**RPC usage example
+
+**I2C master example working with nRF5_SDK\examples\peripheral\twi_master_with_twis_slave directly
+
+**External interrupt example at P0.6
+
+[00:00:00.009,948] <inf> spi_thread: **SPI master example working with nRF5_SDK\examples\peripheral\spis directly
+[00:00:00.009,979] <inf> uart_thread: **high speed UART example
+[00:00:00.010,040] <inf> adc_thread: **ADC sampling example
+[00:00:00.010,070] <inf> adc_thread: ADC thread
+[00:00:00.010,223] <inf> adc_thread: Voltage0: 3004 mV / 3418
+[00:00:00.010,223] <inf> adc_thread: Voltage1: 557 mV / 634
+[00:00:01.154,235] <inf> mcuboot_util: Swap type: revert
+[00:00:01.154,510] <inf> mcuboot_util: Swap type: revert
+[00:00:01.154,998] <inf> mcuboot_util: Swap type: none
+[00:00:01.155,822] <inf> mcuboot_util: Swap type: none
+*** Booting Zephyr OS build v2.4.99-ncs2  ***
+I: Starting bootloader
+I: Primary image: magic=good, swap_type=0x2, copy_done=0x1, image_ok=0x1
+I: Secondary image: magic=unset, swap_type=0x1, copy_done=0x3, image_ok=0x3
+I: Boot source: none
+= secondary slot in External Flash 0 = Ext vtable 10000200, reset addr 10481 I: Swap type: none
+I: Bootloader chainload address offset: 0xc000
+I: Jumping to the first image slot
+I: pcd_lock_ram
+[00:00:00.261,169] <inf> rp_ll_api: Handshake done
+*** Booting Zephyr OS build v2.4.99-ncs2  ***
+
+[00:00:00.261,688] <inf> main: ### New comprensive examples @ appcore version v0.1 compiled at 17:05:16 Apr 30 2021
+
+[00:00:00.261,840] <inf> main: ## OTA/Serial DFU example ##
+[00:00:00.261,871] <wrn> main: exit main thread
+
+**RPC usage example
+
+**I2C master example working with nRF5_SDK\examples\peripheral\twi_master_with_twis_slave directly
+
+**External interrupt example at P0.6
+
+[00:00:00.262,115] <inf> spi_thread: **SPI master example working with nRF5_SDK\examples\peripheral\spis directly
+[00:00:00.262,145] <inf> uart_thread: **high speed UART example
+[00:00:00.262,207] <inf> adc_thread: **ADC sampling example
+[00:00:00.262,237] <inf> adc_thread: ADC thread
+[00:00:00.262,390] <inf> adc_thread: Voltage0: 3008 mV / 3423
+[00:00:00.262,390] <inf> adc_thread: Voltage1: 253 mV / 288

@@ -1,0 +1,21 @@
+
+*** Booting Zephyr OS build v2.4.99-ncs2  ***
+I: Starting bootloader
+I: Primary image: magic=unset, swap_type=0x1, copy_done=0x3, image_ok=0x3
+I: Secondary image: magic=good, swap_type=0x2, copy_done=0x3, image_ok=0x3
+I: Boot source: none
+secondArea id 1 off 0 id 0
+header magic 96f3b83d
+flash name MX25R64vtable 2100aef8, reset addr 100ffc1 I: Swap type: test
+##has upgrade
+boot_validate_slot area id1
+boot_image_check ret 0
+upgrade_valid 1reset_addr 100ffc1 PM_CPUNET_B0N_ADDRESS 1000000I: Starting network core update fw 31b90
+I: Turned on network core
+E: Network core update failed
+boot_validate_slot area id3
+boot_image_check ret 0
+I: Bootloader chainload address offset: 0xc000
+I: Jumping to the first image slot
+I: pcd_lock_ram
+Init begin

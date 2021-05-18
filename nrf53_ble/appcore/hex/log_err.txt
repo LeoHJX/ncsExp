@@ -1,0 +1,158 @@
+*** Booting Zephyr OS build v2.4.99-ncs2  ***
+Area 6 at 0x0 on MX25R64 for 134217728 bytes
+Mount /NAND:: 0
+/NAND:: bsize = 512 ; frsize = 4096 ; blocks = 2043 ; bfree = 2040
+/NAND: opendir: 0
+  D 0 SYSTEM~1
+End of files
+[00:00:00.326,965] [1B][0m<inf> main: The device is put in USB mass storage mode.
+[1B][0m
+*** Booting Zephyr OS build v2.4.99-ncs2  ***
+I: Starting bootloader
+I: Primary image: magic=unset, swap_type=0x1, copy_done=0x3, image_ok=0x3
+I: Secondary image: magic=unset, swap_type=0x1, copy_done=0x3, image_ok=0x3
+I: Boot source: none
+secondArea id 5 off 84000 id 0
+header magic ffffffff
+flash name NRF_FLASH_DRV_NAMEI: Swap type: none
+boot_validate_slot area id2
+boot_image_check ret 0
+I: Bootloader chainload address offset: 0xc000
+I: Jumping to the first image slot
+I: pcd_lock_ram
+Init begin
+
+[00:00:00.261,993] <inf> rp_ll_api: Handshake done
+Init done
+
+*** Booting Zephyr OS build v2.4.99-ncs2  ***
+
+[00:00:00.262,542] <inf> main: ### comprensive examples @ appcore version v0.1 compiled at 23:21:16 Apr 29 2021
+
+[00:00:00.262,695] <inf> main: ## OTA/Serial DFU example ##
+[00:00:00.262,725] <wrn> main: exit main thread
+
+**RPC usage example
+
+**I2C master example working with nRF5_SDK\examples\peripheral\twi_master_with_twis_slave directly
+
+**External interrupt example at P0.6
+
+[00:00:00.262,969] <inf> spi_thread: **SPI master example working with nRF5_SDK\examples\peripheral\spis directly
+[00:00:00.263,031] <inf> uart_thread: **high speed UART example
+[00:00:00.263,092] <inf> adc_thread: **ADC sampling example
+[00:00:00.263,122] <inf> adc_thread: ADC thread
+[00:00:00.263,244] <inf> adc_thread: Voltage0: 3009 mV / 3424
+[00:00:00.263,244] <inf> adc_thread: Voltage1: 596 mV / 679
+[00:00:30.263,336] <inf> adc_thread: ADC thread
+[00:00:30.263,427] <inf> adc_thread: Voltage0: 3007 mV / 3422
+[00:00:30.263,427] <inf> adc_thread: Voltage1: 188 mV / 215
+[00:00:30.273,284] <inf> adc_thread: Voltage0: 3007 mV / 3422 async
+[00:00:30.273,284] <inf> adc_thread: Voltage1: 188 mV / 215 async
+[00:01:00.263,488] <inf> adc_thread: ADC thread
+[00:01:00.263,580] <inf> adc_thread: Voltage0: 3002 mV / 3416
+[00:01:00.263,580] <inf> adc_thread: Voltage1: 212 mV / 242
+[00:01:30.263,641] <inf> adc_thread: ADC thread
+[00:01:30.263,732] <inf> adc_thread: Voltage0: 3005 mV / 3420
+[00:01:30.263,732] <inf> adc_thread: Voltage1: 188 mV / 215
+[00:01:30.273,498] <inf> adc_thread: Voltage0: 3005 mV / 3420 async
+[00:01:30.273,529] <inf> adc_thread: Voltage1: 188 mV / 215 async
+[00:02:00.263,793] <inf> adc_thread: ADC thread
+[00:02:00.263,885] <inf> adc_thread: Voltage0: 3005 mV / 3420
+[00:02:00.263,885] <inf> adc_thread: Voltage1: 298 mV / 340
+[00:02:30.263,946] <inf> adc_thread: ADC thread
+[00:02:30.264,038] <inf> adc_thread: Voltage0: 3002 mV / 3416
+[00:02:30.264,038] <inf> adc_thread: Voltage1: 193 mV / 220
+[00:02:30.273,773] <inf> adc_thread: Voltage0: 3002 mV / 3416 async
+[00:02:30.273,773] <inf> adc_thread: Voltage1: 193 mV / 220 async
+[00:03:00.264,099] <inf> adc_thread: ADC thread
+[00:03:00.264,190] <inf> adc_thread: Voltage0: 3001 mV / 3415
+[00:03:00.264,190] <inf> adc_thread: Voltage1: 208 mV / 237
+[00:03:30.264,251] <inf> adc_thread: ADC thread
+[00:03:30.264,343] <inf> adc_thread: Voltage0: 3002 mV / 3416
+[00:03:30.264,343] <inf> adc_thread: Voltage1: 181 mV / 207
+[00:03:30.274,017] <inf> adc_thread: Voltage0: 3002 mV / 3416 async
+[00:03:30.274,017] <inf> adc_thread: Voltage1: 181 mV / 207 async
+[00:04:00.264,404] <inf> adc_thread: ADC thread
+[00:04:00.264,495] <inf> adc_thread: Voltage0: 3005 mV / 3420
+[00:04:00.264,495] <inf> adc_thread: Voltage1: 217 mV / 247
+[00:04:30.264,556] <inf> adc_thread: ADC thread
+[00:04:30.264,648] <inf> adc_thread: Voltage0: 3011 mV / 3426
+[00:04:30.264,648] <inf> adc_thread: Voltage1: 283 mV / 323
+[00:04:30.274,261] <inf> adc_thread: Voltage0: 3011 mV / 3426 async
+[00:04:30.274,261] <inf> adc_thread: Voltage1: 283 mV / 323 async
+[00:05:00.264,709] <inf> adc_thread: ADC thread
+[00:05:00.264,801] <inf> adc_thread: Voltage0: 2998 mV / 3412
+[00:05:00.264,801] <inf> adc_thread: Voltage1: 242 mV / 276
+[00:05:03.889,526] <inf> mcuboot_util: Swap type: none
+[00:05:04.041,534] <inf> mcuboot_util: Swap type: none
+[00:05:30.264,862] <inf> adc_thread: ADC thread
+[00:05:30.264,953] <inf> adc_thread: Voltage0: 3004 mV / 3418
+[00:05:30.264,953] <inf> adc_thread: Voltage1: 189 mV / 216
+[00:05:30.274,505] <inf> adc_thread: Voltage0: 3004 mV / 3418 async
+[00:05:30.274,505] <inf> adc_thread: Voltage1: 189 mV / 216 async
+[00:06:00.265,014] <inf> adc_thread: ADC thread
+[00:06:00.265,106] <inf> adc_thread: Voltage0: 3004 mV / 3418
+[00:06:00.265,106] <inf> adc_thread: Voltage1: 279 mV / 318
+[00:06:30.265,167] <inf> adc_thread: ADC thread
+[00:06:30.265,258] <inf> adc_thread: Voltage0: 3005 mV / 3420
+[00:06:30.265,258] <inf> adc_thread: Voltage1: 301 mV / 343
+[00:06:30.274,749] <inf> adc_thread: Voltage0: 3005 mV / 3420 async
+[00:06:30.274,749] <inf> adc_thread: Voltage1: 301 mV / 343 async
+*** Booting Zephyr OS build v2.4.99-ncs2  ***
+I: Starting bootloader
+I: Primary image: magic=unset, swap_type=0x1, copy_done=0x3, image_ok=0x3
+I: Secondary image: magic=good, swap_type=0x2, copy_done=0x3, image_ok=0x3
+I: Boot source: none
+secondArea id 5 off 84000 id 0
+header magic 96f3b83d
+flash name NRF_FLASH_DRV_NAMEinternal flash DFUvtable 2000045c, reset addr 3a000 I: Swap type: test
+##has upgrade
+boot_validate_slot area id5
+boot_image_check ret 0
+upgrade_valid 1reset_addr 3a000 PM_CPUNET_B0N_ADDRESS 1000000boot_validate_slot area id2
+boot_image_check ret 0
+I: Bootloader chainload address offset: 0xc000
+I: Jumping to the first image slot
+I: pcd_lock_ram
+*** Booting Zephyr OS build v2.4.99-ncs2  ***
+I: Starting bootloader
+I: Primary image: magic=good, swap_type=0x2, copy_done=0x1, image_ok=0x3
+I: Secondary image: magic=unset, swap_type=0x1, copy_done=0x3, image_ok=0x3
+I: Boot source: none
+secondArea id 5 off 84000 id 0
+header magic 96f3b83d
+flash name NRF_FLASH_DRV_NAMEinternal flash DFUvtable 2000045c, reset addr 3a000 I: Swap type: revert
+##has upgrade
+boot_validate_slot area id5
+boot_image_check ret 0
+upgrade_valid 1reset_addr 3a000 PM_CPUNET_B0N_ADDRESS 1000000I: Secondary image: magic=unset, swap_type=0x1, copy_done=0x3, image_ok=0x3
+boot_validate_slot area id2
+boot_image_check ret 0
+I: Bootloader chainload address offset: 0xc000
+I: Jumping to the first image slot
+I: pcd_lock_ram
+Init begin
+
+[00:00:00.009,063] <inf> rp_ll_api: Handshake done
+Init done
+
+*** Booting Zephyr OS build v2.4.99-ncs2  ***
+
+[00:00:00.009,643] <inf> main: ### comprensive examples @ appcore version v0.1 compiled at 23:21:16 Apr 29 2021
+
+[00:00:00.009,796] <inf> main: ## OTA/Serial DFU example ##
+[00:00:00.009,796] <wrn> main: exit main thread
+
+**RPC usage example
+
+**I2C master example working with nRF5_SDK\examples\peripheral\twi_master_with_twis_slave directly
+
+**External interrupt example at P0.6
+
+[00:00:00.010,070] <inf> spi_thread: **SPI master example working with nRF5_SDK\examples\peripheral\spis directly
+[00:00:00.010,101] <inf> uart_thread: **high speed UART example
+[00:00:00.010,162] <inf> adc_thread: **ADC sampling example
+[00:00:00.010,192] <inf> adc_thread: ADC thread
+[00:00:00.010,314] <inf> adc_thread: Voltage0: 3014 mV / 3430
+[00:00:00.010,345] <inf> adc_thread: Voltage1: 534 mV / 608

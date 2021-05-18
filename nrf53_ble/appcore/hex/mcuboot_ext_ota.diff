@@ -1,0 +1,118 @@
+diff --git a/boot/bootutil/src/loader.c b/boot/bootutil/src/loader.c
+index 716e3ed..d016573 100644
+--- a/boot/bootutil/src/loader.c
++++ b/boot/bootutil/src/loader.c
+@@ -598,6 +598,7 @@ boot_validate_slot(struct boot_loader_state *state, int slot,
+     int rc;
+ 
+     area_id = flash_area_id_from_multi_image_slot(BOOT_CURR_IMG(state), slot);
++    printk("boot_validate_slot area id%d\n", area_id);
+     rc = flash_area_open(area_id, &fap);
+     if (rc != 0) {
+         FIH_RET(fih_rc);
+@@ -622,7 +623,7 @@ boot_validate_slot(struct boot_loader_state *state, int slot,
+             swap_erase_trailer_sectors(state, fap);
+         }
+ #endif
+-
++        printk("boot_check_header_erased\n");
+         /* No bootable image in slot; continue booting from the primary slot. */
+         fih_rc = fih_int_encode(1);
+         goto out;
+@@ -647,6 +648,7 @@ boot_validate_slot(struct boot_loader_state *state, int slot,
+ #endif
+ 
+     FIH_CALL(boot_image_check, fih_rc, state, hdr, fap, bs);
++    printk("boot_image_check ret %d\n", fih_rc);
+     if (!boot_is_header_valid(hdr, fap) || fih_not_eq(fih_rc, FIH_SUCCESS)) {
+         if ((slot != BOOT_PRIMARY_SLOT) || ARE_SLOTS_EQUIVALENT()) {
+             flash_area_erase(fap, 0, fap->fa_size);
+@@ -654,6 +656,7 @@ boot_validate_slot(struct boot_loader_state *state, int slot,
+              * attempts to validate and boot it.
+              */
+         }
++        printk("image check error\n");
+ #if !defined(__BOOTSIM__)
+         BOOT_LOG_ERR("Image in the %s slot is not valid!",
+                      (slot == BOOT_PRIMARY_SLOT) ? "primary" : "secondary");
+@@ -733,7 +736,7 @@ boot_validated_swap_type(struct boot_loader_state *state,
+ #if defined(PM_S1_ADDRESS) || defined(CONFIG_SOC_NRF5340_CPUAPP)
+     const struct flash_area *secondary_fa =
+         BOOT_IMG_AREA(state, BOOT_SECONDARY_SLOT);
+-    struct image_header *hdr = (struct image_header *)secondary_fa->fa_off;
++    struct image_header *hdr = boot_img_hdr(state, BOOT_SECONDARY_SLOT);
+     uint32_t vtable_addr = 0;
+     uint32_t *vtable = 0;
+     uint32_t reset_addr = 0;
+@@ -744,11 +747,33 @@ boot_validated_swap_type(struct boot_loader_state *state,
+      * vector. Note that there are good reasons for not using img_num from
+      * the swap info.
+      */
+-
++    printk("secondArea id %d off %x id %x\n", secondary_fa->fa_id, secondary_fa->fa_off, secondary_fa->fa_device_id);
++    printk("header magic %x\n", hdr->ih_magic);
++    printk("flash name %s", secondary_fa->fa_dev_name);
+     if (hdr->ih_magic == IMAGE_MAGIC) {
+-        vtable_addr = (uint32_t)hdr + hdr->ih_hdr_size;
+-        vtable = (uint32_t *)(vtable_addr);
+-        reset_addr = vtable[1];
++        if (strcmp(secondary_fa->fa_dev_name, "NRF_FLASH_DRV_NAME") == 0)
++        {
++            printk("internal flash DFU");
++            vtable_addr = (uint32_t)hdr + hdr->ih_hdr_size;
++            vtable = (uint32_t *)(vtable_addr);
++            reset_addr = vtable[1];
++            printk("vtable %x, reset addr %x ", vtable_addr, reset_addr); 
++        }
++        else
++        {
++            //external flash
++            uint32_t vect[2];
++            printk("external flash DFU");
++            vtable_addr = hdr->ih_hdr_size;
++            int rc = flash_area_read(secondary_fa, vtable_addr, vect, sizeof(vect));
++            if (rc != 0) {
++                return BOOT_SWAP_TYPE_FAIL;
++            }
++            vtable = (uint32_t *) vect[0];
++            reset_addr = vect[1];
++            printk("vtable %x, reset addr %x ", vect[0], vect[1]); 
++        }
++
+ #ifdef PM_S1_ADDRESS
+         const struct flash_area *primary_fa;
+         int rc = flash_area_open(flash_area_id_from_multi_image_slot(
+@@ -775,6 +800,7 @@ boot_validated_swap_type(struct boot_loader_state *state,
+         /* Boot loader wants to switch to the secondary slot.
+          * Ensure image is valid.
+          */
++        printk("##has upgrade\n");
+         FIH_CALL(boot_validate_slot, fih_rc, state, BOOT_SECONDARY_SLOT, bs);
+         if (fih_not_eq(fih_rc, FIH_SUCCESS)) {
+             if (fih_eq(fih_rc, fih_int_encode(1))) {
+@@ -785,16 +811,24 @@ boot_validated_swap_type(struct boot_loader_state *state,
+         } else {
+             upgrade_valid = true;
+         }
++        printk("upgrade_valid %d", upgrade_valid);       
++        
+ 
+ #if defined(CONFIG_SOC_NRF5340_CPUAPP) && defined(PM_CPUNET_B0N_ADDRESS)
+         /* If the update is valid, and it targets the network core: perform the
+          * update and indicate to the caller of this function that no update is
+          * available
+          */
++        uint32_t i = PM_CPUNET_B0N_ADDRESS;
++        printk("reset_addr %x PM_CPUNET_B0N_ADDRESS %x",reset_addr, i);
+         if (upgrade_valid && reset_addr > PM_CPUNET_B0N_ADDRESS) {
+             uint32_t fw_size = hdr->ih_img_size;
+ 
+-            BOOT_LOG_INF("Starting network core update");
++            BOOT_LOG_INF("Starting network core update fw %x", fw_size);
++            if (strcmp(secondary_fa->fa_dev_name, "NRF_FLASH_DRV_NAME") != 0)
++            {
++                NRF_QSPI_S->XIPEN = 1;
++            }
+             int rc = pcd_network_core_update(vtable, fw_size);
+ 
+             if (rc != 0) {

@@ -63,8 +63,8 @@ void main(void)
 #else /* trun off   */
 
 		//nrf_regulators_dcdcen_set(NRF_REGULATORS,0);
-		k_msleep(2000);
-		nrf_regulators_system_off(NRF_REGULATORS_NS);
+		//k_msleep(2000);
+		//nrf_regulators_system_off(NRF_REGULATORS_NS);
 
 #endif
 		k_msleep(SLEEP_TIME_MS);

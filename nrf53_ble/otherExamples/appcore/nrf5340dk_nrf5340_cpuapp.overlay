@@ -12,10 +12,10 @@
 };
 
 &uart1 {
-	status = "okay";
+	status = "disabled";
 	current-speed = < 115200 >;
-	tx-pin = < 7 >;
-	rx-pin = < 2 >;
+	tx-pin = < 26 >;
+	rx-pin = < 7 >;
 };
 
 &i2c1 {

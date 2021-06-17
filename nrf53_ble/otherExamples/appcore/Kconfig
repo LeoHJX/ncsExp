@@ -50,6 +50,11 @@ choice
 		bool "app core and net core communicate by tx and rx data directly, just like uart"
 endchoice
 
+config RPC_NUS_DEDICATE
+	bool "load dedicated NUS RPC API"
+	help
+		if yes, load dedicated NUS RPC API
+
 config EXAMPLE_HS_UART
 	bool "load high speed UART example or not"
 	help

@@ -12,10 +12,7 @@
 
 #include "../../common_ids.h"
 
-
 #define CBOR_BUF_SIZE 16
-
-
 
 static void (*result_callback)(uint8_t *buffer, uint16_t length);
 
@@ -110,28 +107,3 @@ static void rpc_app_bt_receive_cb(CborValue *value, void *handler_data)
 NRF_RPC_CBOR_CMD_DECODER(rpc_nus, rpc_app_bt_receive,
 			 RPC_COMMAND_NET_BT_NUS_RECEIVE_CB,
 			 rpc_app_bt_receive_cb, NULL);
-
-static void err_handler(const struct nrf_rpc_err_report *report)
-{
-	printk("nRF RPC error %d ocurred. See nRF RPC logs for more details.",
-	       report->code);
-	k_oops();
-}
-
-
-static int serialization_init(const struct device *dev)
-{
-	ARG_UNUSED(dev);
-
-	int err;	
-
-	err = nrf_rpc_init(err_handler);
-	if (err) {
-		return -NRF_EINVAL;
-	}
-
-	return 0;
-}
-
-
-SYS_INIT(serialization_init, POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY);

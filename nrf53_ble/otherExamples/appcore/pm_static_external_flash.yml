@@ -27,7 +27,7 @@ storage:
   size: 0x4000
   region: flash_primary
 mcuboot_secondary:
-  address: 0x0
+  address: 0x710000
   size: 0xf0000
   device: MX25R64
   region: external_flash
@@ -50,7 +50,7 @@ sram_primary:
   region: sram_primary
   size: 0x7e000
 external_flash:
-  address: 0xf0000
+  address: 0x0
   size: 0x710000
   device: MX25R64
   region: external_flash  

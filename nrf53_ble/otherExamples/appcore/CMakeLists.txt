@@ -26,12 +26,20 @@ target_sources_ifdef(CONFIG_EXAMPLE_HS_UART app
 					 
 target_sources_ifdef(CONFIG_EXAMPLE_ADC app
                      PRIVATE src/adc_thread.c)					 
-					 
-target_sources_ifdef(CONFIG_EXAMPLE_RPC_IN_USE app
-                     PRIVATE src/rpc_thread.c)
+
+if (CONFIG_EXAMPLE_RPC_IN_USE AND CONFIG_RPC_REMOTE_API)
+  target_sources(app PRIVATE src/rpc_thread1.c)
+endif()
+
+if (CONFIG_EXAMPLE_RPC_IN_USE AND CONFIG_RPC_SIMULATE_UART)
+  target_sources(app PRIVATE src/rpc_thread2.c)
+endif()                 
 					 
 target_sources_ifdef(CONFIG_RPC_REMOTE_API app
-                     PRIVATE src/rpc_app_nus.c)
+                     PRIVATE src/rpc_app_api_general.c src/rpc_app_api.c)
+					 
+target_sources_ifdef(CONFIG_RPC_NUS_DEDICATE app
+                     PRIVATE src/rpc_app_nus.c)						 
 
 target_sources_ifdef(CONFIG_EXAMPLE_DFU_OTA app
                      PRIVATE src/rpc_app_smp.c)		

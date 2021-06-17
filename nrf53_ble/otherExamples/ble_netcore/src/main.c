@@ -30,6 +30,7 @@
 #include <logging/log.h>
 #include "rpc_net_nus.h"
 #include "rpc_net_smp_bt.h"
+#include "rpc_net_api.h"
 
 #ifdef CONFIG_RPC_SIMULATE_UART
 #include "nrf_rpc_tr.h"
@@ -118,6 +119,12 @@ static void connected(struct bt_conn *conn, uint8_t err)
 
 	k_sem_give(&ble_conn_ok);
 
+#ifdef CONFIG_RPC_REMOTE_API
+	err = net2app_send_conn_status(1);
+	if (err) {
+		LOG_ERR("send connected err %d", err);
+	}	
+#endif
 #ifdef CONFIG_RPC_SIMULATE_UART
 	int ret;
 	uint8_t data[] = {0x55, 0x01, 0x01, 0x00, 0xAA};
@@ -151,6 +158,14 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 		bt_conn_unref(current_conn);
 		current_conn = NULL;		
 	}
+
+#ifdef CONFIG_RPC_REMOTE_API
+	int err = net2app_send_conn_status(0);
+	if (err) {
+		LOG_ERR("send disconnected err %d", err);
+	}	
+#endif
+
 #ifdef CONFIG_RPC_SIMULATE_UART
 	int ret;
 	uint8_t data[] = {0x55, 0x01, 0x01, 0x01, 0xAA};
@@ -173,20 +188,27 @@ static struct bt_conn_cb conn_callbacks = {
 static void bt_nus_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 			  uint16_t len)
 {	
-	char addr[BT_ADDR_LE_STR_LEN] = {0};	
+	char addr[BT_ADDR_LE_STR_LEN] = {0};
+	int err;	
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, ARRAY_SIZE(addr));
 
 	LOG_INF("Received data from: %s", log_strdup(addr));
 	LOG_HEXDUMP_INF(data, len, "data:");
 
-#ifdef CONFIG_RPC_REMOTE_API
+#ifdef CONFIG_RPC_NUS_DEDICATE
 	rpc_net_bt_nus_receive_cb(data, len);
+#endif
+#ifdef CONFIG_RPC_REMOTE_API	
+	err = net2app_send_nus((uint8_t *)data, len);
+	if (err) {
+		LOG_ERR("network to application core nus send err %d", err);
+	}	
 #endif
 
 #ifdef CONFIG_RPC_SIMULATE_UART
 		uint8_t * data1 = (uint8_t *)data;
-		int err = nrf_rpc_tr_send(data1, len);
+		err = nrf_rpc_tr_send(data1, len);
 		if (err) {
 			printk("nrf_rpc_tr_send netcore failed: %d\n", err);			
 		}
@@ -195,7 +217,6 @@ static void bt_nus_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 			printk("nrf_rpc_tr_send success netcore\n");
 		}
 #endif
-
 
 }
 
@@ -340,6 +361,13 @@ void main(void)
 	}
 
 	LOG_INF("Started NUS example on netcore");
+
+#ifdef CONFIG_RPC_REMOTE_API
+	err = net2app_send_bt_addr();
+	if (err) {
+		LOG_ERR("BT dev addr sent err %d", err);
+	}
+#endif		
 
 	for (;;) {		
 		k_sleep(K_SECONDS(1));	

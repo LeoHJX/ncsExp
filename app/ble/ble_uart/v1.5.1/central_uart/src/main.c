@@ -354,14 +354,17 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 	}
 
 	LOG_INF("Connected: %s", log_strdup(addr));
-
-	err = bt_conn_set_security(conn, BT_SECURITY_L1);
+    bt_security_t set_sec_flag = BT_SECURITY_L2;
+	err = bt_conn_set_security(conn, set_sec_flag);
 	if (err) {
 		LOG_WRN("Failed to set security: %d", err);
 
 		gatt_discover(conn);
 	}
-
+    if(set_sec_flag == BT_SECURITY_L1 || set_sec_flag == BT_SECURITY_L1)
+    {
+        gatt_discover(conn);
+    }
 	err = bt_scan_stop();
 	if ((!err) && (err != -EALREADY)) {
 		LOG_ERR("Stop LE scan failed (err %d)", err);
@@ -462,18 +465,11 @@ static int nus_client_init(void)
 BT_SCAN_CB_INIT(scan_cb, scan_filter_match, NULL,
 		scan_connecting_error, scan_connecting);
 
-#define BT_GAP_INIT_CONN_INT_MIN_LOCAL                (100/1.25)  /* X ms    */
-#define BT_GAP_INIT_CONN_INT_MAX_LOCAL                (300/1.25)  /* X ms    */
-#define BT_LE_CONN_PARAM_LOCAL BT_LE_CONN_PARAM(BT_GAP_INIT_CONN_INT_MIN_LOCAL, \
-						  BT_GAP_INIT_CONN_INT_MAX_LOCAL, \
-						  100, 2500)
-
 static int scan_init(void)
 {
 	int err;
 	struct bt_scan_init_param scan_init = {
 		.connect_if_match = 1,
-        .conn_param = BT_LE_CONN_PARAM_LOCAL,
 	};
 
 	bt_scan_init(&scan_init);

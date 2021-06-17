@@ -15,7 +15,10 @@ target_sources(app PRIVATE
 )
 
 target_sources_ifdef(CONFIG_RPC_REMOTE_API app
-                     PRIVATE src/rpc_net_nus.c)
+                     PRIVATE src/rpc_net_api_general.c src/rpc_net_api.c)
+
+target_sources_ifdef(CONFIG_RPC_NUS_DEDICATE app
+                     PRIVATE src/rpc_net_nus.c)						 
 
 target_sources_ifdef(CONFIG_EXAMPLE_DFU_OTA app
                      PRIVATE src/rpc_net_smp_bt.c)

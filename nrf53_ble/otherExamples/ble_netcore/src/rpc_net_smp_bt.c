@@ -152,7 +152,7 @@ static void rpc_net_bt_smp_send(CborValue *packet, void *handler_data)
 					       NULL);
 	if (cbor_err != CborNoError || length < 0 || length > sizeof(buf)) {
 		LOG_ERR("net rpc send len err");
-		err = -NRF_EBADMSG;		
+		err = -EBADMSG;		
 	}
 	else
 	{

@@ -480,12 +480,6 @@ static void configure_gpio(void)
 	}
 }
 
-#define   BT_GAP_ADV_SLOW_INT_MIN_LOCAL (100/0.625)
-#define   BT_GAP_ADV_SLOW_INT_MAX_LOCAL (110/0.625)
-
-#define BT_ADV_CON_LOCAL BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE, \
-				       BT_GAP_ADV_SLOW_INT_MIN_LOCAL, \
-				       BT_GAP_ADV_SLOW_INT_MAX_LOCAL, NULL)
 void main(void)
 {
 	int blink_status = 0;
@@ -523,7 +517,7 @@ void main(void)
 		return;
 	}
 
-	err = bt_le_adv_start(BT_ADV_CON_LOCAL, ad, ARRAY_SIZE(ad), sd,
+	err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), sd,
 			      ARRAY_SIZE(sd));
 	if (err) {
 		LOG_ERR("Advertising failed to start (err %d)", err);

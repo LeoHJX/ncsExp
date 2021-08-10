@@ -2,7 +2,7 @@
 	compatible = "nordic,nrf-spim";
 	status = "ok";
 	mosi-pin = <4>;
-	miso-pin = <10>;	//<10>;	//<5>;
+	miso-pin = <5>;	//<10>;	//<5>;
 	sck-pin = <6>;
 };
 

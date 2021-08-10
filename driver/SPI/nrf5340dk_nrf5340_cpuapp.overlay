@@ -2,7 +2,7 @@
 	compatible = "nordic,nrf-spim";
 	status = "ok";
 	mosi-pin = <4>;
-	miso-pin = <10>;	//<10>;	//<5>;
+	miso-pin = <5>;	//<10>;	//<5>;
 	sck-pin = <6>;
 	cs-gpios = < &gpio0 7 0x1 >; // gpio: p0.07
 	cs47l63@0 {

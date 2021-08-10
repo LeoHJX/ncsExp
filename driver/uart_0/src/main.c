@@ -18,13 +18,13 @@
 
 #define UART_USE_RX_INTERRUPT 1
 
-#define UART_SIMPLE_EN_DIS_POWER_SAVING 0  /* this option doesn't work; can't resume UART after LP */
+#define UART_SIMPLE_EN_DIS_POWER_SAVING 0 /* this option doesn't work; can't resume UART after LP */
 
 #if !UART_SIMPLE_EN_DIS_POWER_SAVING
 /* nrf52840 have to use Zephyr power manager to gets to LP stage, or add a workaround, but doesn't resume to normal operations. */
 /* this options require add "CONFIG_DEVICE_POWER_MANAGEMENT=y" to prj.conf */
 /* verified with 52833, 52840; more to add */
-#define UART_LP_USE_Z_PWR_MANAGER 1
+//#define UART_LP_USE_Z_PWR_MANAGER 1
 #endif
 
 /*   testing options end */

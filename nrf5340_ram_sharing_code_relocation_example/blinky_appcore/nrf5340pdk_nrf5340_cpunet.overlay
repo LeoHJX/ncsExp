@@ -1,0 +1,4 @@
+&temp {
+	compatible = "nordic,nrf-temp";
+	status = "okay";
+};

@@ -1,0 +1,23 @@
+/*  */
+&spi3 {
+	compatible = "nordic,nrf-spim";
+	status = "ok";
+	mosi-pin = <18>;
+	miso-pin = <17>;	//<10>;	//<5>;
+	sck-pin = <19>;
+	cs-gpios = < &gpio0 16 0x1 >; // gpio: p0.19
+	cs47l63@0 {
+		compatible = "cirrus_logic,cs47l63";
+		label = "CS47L63";
+		reg = <0>;	
+	};		
+};
+
+
+
+&i2c1 {
+    status = "disabled";
+};
+&i2c2 {
+    status = "disabled";
+};

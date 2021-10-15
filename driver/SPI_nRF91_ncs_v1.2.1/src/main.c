@@ -47,8 +47,8 @@ static void spi_init(void)
 #if !SPI_CS_CFG_FROM_DTS /* not from DTS */
 	/* A quick dirty way to add CS to SPI Master to control slave CS  */
 	cs_ctrl.delay = 0U; /* us time setup CS before and after SPI activities   */
-	cs_ctrl.gpio_pin = 25; /* px.07; GPIO_0 -> p0.07 */
-	cs_ctrl.gpio_dt_flags = GPIO_ACTIVE_LOW;
+	cs_ctrl.gpio_pin = 25; /* px.07; GPIO_0 -> p0.25 */
+	cs_ctrl.gpio_dt_flags = 1;  // only avaiable in later NCS releases, please enable this line when compile with later ncs versions. 
 	cs_ctrl.gpio_dev = device_get_binding("GPIO_0");
 
 	if (!cs_ctrl.gpio_dev) {
@@ -105,7 +105,7 @@ void spi_read_rdid(void)  /* read device id */
             .len = 3   /* 3 */
         }
 	};
-	const struct spi_buf_set rx = { .buffers = (struct spi_buf*)(&rx_buf), .count = 7 };
+	const struct spi_buf_set rx = { .buffers = (struct spi_buf*)(&rx_buf), .count = 2 };
     tx_buffer[0] = 0x9f;
 	err = spi_transceive(spi_dev, &spi_cfg, &tx, &rx);
 	if (err) {
@@ -170,7 +170,7 @@ void spi_read_rems(void)  /* read electronic manufacture & device id  */
         },
         {
             .buf = rx_buffer,
-            .len = 5  /* 5 */
+            .len = 5  /* 5 */     /*   use a wrong number on purpose */
         }
 	};
 	const struct spi_buf_set rx = { .buffers = rx_buf, .count = 2 };
@@ -185,80 +185,6 @@ void spi_read_rems(void)  /* read electronic manufacture & device id  */
 	}
 }
 
-
-static uint8_t spi_rw(uint8_t* pu8Mosi, uint8_t* pu8Miso, uint16_t u16Sz)
-{
-//   HAL_StatusTypeDef status;  
-    uint8_t status;
-    int err;
-
-/*----------------------------------------------------------------------------------*/
-  // const struct spi_buf rx_buf[] = {
-   struct spi_buf rx_buf[] = {
-//                                    {
-// //                                  .buf =   NULL,                /*  */
-// //                                   .len =  1,
-//                                     .buf = pu8Miso,
-//                                    .len = u16Sz,
-//
-//  //                                 .buf =   pu8Mosi,                /*  */
-//  //                                  .len =  u16Sz,
-//                                    },
-//
-                                    {
-                                    .buf = pu8Miso,
-                                    .len = u16Sz,
-                                    }
-                                  };
-
-     struct spi_buf_set rx = {
-        .buffers = rx_buf,
-        .count = sizeof(rx_buf) / sizeof(struct spi_buf)
-                };
-
- /*----------------------------------------------------------------------------------*/
-   struct spi_buf tx_buf [] = {
-            {
-            .buf = pu8Mosi,
-            .len = u16Sz/sizeof(uint8_t)
-            }
-    };
-    const struct spi_buf_set tx = {
-            .buffers = tx_buf,
-            .count = sizeof(tx_buf)/sizeof(struct spi_buf)
-    };
-/*----------------------------------------------------------------------------------*/
- 
-
-    /* Start SPI transaction - polling method */
-    /* Transmit/Recieve */
-    if (pu8Mosi == NULL)                                              /* Read Data */
-    {
-
-    err = spi_transceive(spi_dev,&spi_cfg, NULL, &rx);
-
-    }
-    else if(pu8Miso == NULL)                                          /* Write Data */
-    {
-
-     err = spi_transceive(spi_dev,&spi_cfg, &tx, NULL);
-   }
-    else
-    {     
-    err = spi_transceive(spi_dev,&spi_cfg, &tx, &rx); 
-    } 
-     
-
-    /* Handle Transmit/Recieve error */
-    if (err)
-    {
-        printk("%s: HAL_SPI_TransmitReceive failed. error (%d)\n",__FUNCTION__,err);
-        return status;
-    }
-
-
-    return 0;
-}
 void main(void)
 {
 	printk("SPIM Example\n");
@@ -267,37 +193,14 @@ void main(void)
   //  if (!spi_is_ready(&spi_cfg)) {
   //      return -ENODEV;
   //  }
- #if 0
-	while (1) {
-
-        printk("###################################################\n");
-        uint8_t w[100] = {0xaa};
-        uint8_t r[100] = {0x55};
-        spi_rw(w, NULL, 50);
-        k_sleep(K_MSEC(10));
-        spi_rw(w, r, 50);
-        k_sleep(K_MSEC(10));        
-        spi_rw(NULL, r, 1);
-        k_sleep(K_MSEC(1000));
-        
-		//spi_read_rdid();
-        k_sleep(K_MSEC(30));
-         /* 
-        spi_read_res();
-        k_sleep(K_MSEC(30));
-        spi_read_rems();
-		k_sleep(K_MSEC(100)); */
-        /**/
-	}  
- #endif
+    
 	while (1) {
         printk("###################################################\n");
-		spi_read_rdid();
-        k_sleep(K_MSEC(30));
-        spi_read_res();
-        k_sleep(K_MSEC(30));
-        spi_read_rems();
-		k_sleep(K_MSEC(1000));
+		spi_read_rdid();  //9f
+        k_sleep(K_MSEC(100));
+        spi_read_res();  //ab
+        k_sleep(K_MSEC(100));
+    	spi_read_rems(); //90
+		k_sleep(K_MSEC(500));
 	}
-
 }

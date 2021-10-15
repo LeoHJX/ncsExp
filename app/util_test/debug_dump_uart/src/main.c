@@ -11,8 +11,18 @@
 #include <sys/__assert.h>
 #include <string.h>
 
+/*
+   TEST_CASE_NUM
+   0: no crash. 
+   1: crash with stack overflow, with small stack assigned to the stack. 
+   2: crash with stack overflow, adding code causing stackover flow. 
+   3: memory access crash. 
+*/
+#define TEST_CASE_NUM  0
+
+
 /* size of stack area used by each thread */
-#define STACKSIZE 200
+#define STACKSIZE 1024
 
 /* scheduling priority used by each thread */
 #define PRIORITY 7
@@ -96,20 +106,53 @@ void blink1(void)
 {
 	blink(&led1, 1000, 1);
 }
+#if (TEST_CASE_NUM == 2)
+void clear_buffer(void)
+{
+    uint8_t buf[1024] = {0xaa};
+    memset(buf, 0xaa, sizeof(buf));
+}
+#endif
 
+#if (TEST_CASE_NUM == 3)
+int bad_pointer(int *pt)
+{
+    static int temp;
+    
+    temp = temp + 100;
+
+    pt = pt + temp;
+    *pt = 0x5a5a5a5a;
+    return *pt;
+} 
+#endif
 void uart_out(void)
 {
 	while (1) {
+#if (TEST_CASE_NUM == 3)
+    int *ptr = 0;   /*  pointer */
+    bad_pointer(ptr);
+#endif
+
 		struct printk_data_t *rx_data = k_fifo_get(&printk_fifo,
 							   K_FOREVER);
 		printk("Toggled led%d; counter=%d\n",
 		       rx_data->led, rx_data->cnt);
 		k_free(rx_data);
+#if (TEST_CASE_NUM == 2)
+        clear_buffer();
+#endif
+
 	}
 }
 
+#if (TEST_CASE_NUM == 1)
+K_THREAD_DEFINE(blink0_id, 200, blink0, NULL, NULL, NULL,
+		PRIORITY, 0, 0);
+#else
 K_THREAD_DEFINE(blink0_id, STACKSIZE, blink0, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
+#endif
 K_THREAD_DEFINE(blink1_id, STACKSIZE, blink1, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 K_THREAD_DEFINE(uart_out_id, STACKSIZE, uart_out, NULL, NULL, NULL,

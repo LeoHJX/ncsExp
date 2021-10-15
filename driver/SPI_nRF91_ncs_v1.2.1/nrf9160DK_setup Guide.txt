@@ -1,0 +1,25 @@
+Use SPI flash on the DK to nRF9160. 
+
+By default, the SPI flash routed to on Board nRF52840, requires to map the Flash to 9160 before any testing. 
+
+NCS v1.7.0 (tested version)
+
+Got to /zephyr/samples/hello_world
+
+Create a overlay file "nrf9160dk_nrf52840.overlay"
+
+Then add the follow lines to it. 
+
+	&external_flash_pins_routing {
+		status = "okay";
+	};
+
+Then build the project with  command :  west build -b nrf9160dk_nrf52840@0.14.0
+
+Flash to nRF52840 (hello world will output to the serial driver id 0002). 
+
+Then switch back to debugging with nRF9160. 
+
+Please Power circle the board before next step. 
+
+Now SPI should talking to the SPI flash. 

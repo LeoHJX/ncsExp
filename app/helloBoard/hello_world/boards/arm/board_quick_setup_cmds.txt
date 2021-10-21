@@ -1,3 +1,3 @@
-mmv '*hello_board*' '#1test_board#2'
-sed -i 's/hello_board/test_board/g' ./*
-sed -i 's/HELLO_BOARD/TEST_BOARD/g' ./*
+mmv '*hello_board*' '#1test_board#2'    // move all files to a new name.  please change the folder name first. 
+sed -i 's/hello_board/test_board/g' ./* // replace the names from hello -> test_x  
+sed -i 's/HELLO_BOARD/TEST_BOARD/g' ./*  // same as above but with upper case. 

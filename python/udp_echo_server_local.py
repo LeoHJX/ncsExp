@@ -13,6 +13,8 @@ print("Listening on ", server_address, ":", str(server_port), flush=True)
 
 while True:
     payload, client_address = sock.recvfrom(4096)
-    print("Echoing back to ", str(client_address), ": ", payload)
-    sent = sock.sendto(payload, client_address)
-    print("Sent len: ", str(sent), flush=True)
+    if(payload[:3] == 'pkg:'):
+`       print("Echoing back to ", str(client_address), ": ", payload)
+        sent = sock.sendto(payload, client_address)
+        print("Sent len: ", str(sent), flush=True)`
+

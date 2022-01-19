@@ -1,0 +1,1 @@
+based on NCS v1.8.0, added nRF52840dk_nrf52811 support over SPI. 

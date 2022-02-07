@@ -1,0 +1,12 @@
+external_flash:
+  address: 0x00
+  end_address: 0x800000
+  region: external_flash
+  size: 0x800000
+
+mcuboot_secondary:
+  address: 0x00000
+  device: MX25R64TEST
+  end_address: 0xf2000
+  region: external_flash
+  size: 0xf2000

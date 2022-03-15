@@ -1,0 +1,27 @@
+#
+# Copyright (c) 2019 Nordic Semiconductor
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+source "Kconfig.zephyr"
+
+menu "iso benchmark nrf52840"
+
+config ISO_TX_PA_MODE
+	bool "Enable TX PA mode"
+	default n
+	help
+	  Enable TX PA mode.
+
+config ISO_RX_LNA_MODE
+	bool "Enable RX LNA mode"
+	default n
+	help
+	  Enable RX LNA mode.
+
+#config example
+#	int "example"
+#	default 42
+
+endmenu

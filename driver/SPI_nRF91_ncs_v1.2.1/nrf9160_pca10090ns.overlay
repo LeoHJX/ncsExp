@@ -1,5 +1,5 @@
 /*  */
-&spi3 {
+&spi1 {
 	compatible = "nordic,nrf-spim";
 	status = "okay";
 	sck-pin = <13>;
@@ -14,4 +14,15 @@
 		jedec-id = [c2 28 17];
 		size = <67108864>;
 	};
+};
+
+&spi3 {
+
+	status = "disabled";
+
+};
+&uart1 {
+
+	status = "disabled";
+
 };

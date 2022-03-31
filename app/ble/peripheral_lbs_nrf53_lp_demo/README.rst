@@ -1,5 +1,5 @@
 .. _peripheral_lbs:
-
+Modified to demo nRF5340 low power, tested with NCS v1.9.1
 Bluetooth: Peripheral LBS
 #########################
 

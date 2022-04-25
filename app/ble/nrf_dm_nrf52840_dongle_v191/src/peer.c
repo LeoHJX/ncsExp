@@ -252,11 +252,11 @@ static void led_notification(const struct peer_entry *peer)
 		
 		if(res <= DISTANCE_R_MAX_LED) //R 0-1m 
 		{
-			dk_set_led_on(LED_R);
-			dk_set_led_off(LED_G);
-			dk_set_led_off(LED_B);
-				
+			dk_set_led_off(LED_R);
+			dk_set_led_on(LED_G);
+			dk_set_led_off(LED_B);	
 		}
+		/* 
 		else if ((res > DISTANCE_R_MAX_LED) && (res <= DISTANCE_G_MAX_LED)) //G 1m - 2m
 		{
 			dk_set_led_off(LED_R);
@@ -294,10 +294,10 @@ static void led_notification(const struct peer_entry *peer)
 			dk_set_led_on(LED_R);
 			dk_set_led_on(LED_G);
 			dk_set_led_on(LED_B);			
-		}
-		else  // out of range. off.   above 7m.
+		}*/
+		else  // above 1m.
 		{
-			dk_set_led_off(LED_R);
+			dk_set_led_on(LED_R);
 			dk_set_led_off(LED_G);
 			dk_set_led_off(LED_B);	
 		}

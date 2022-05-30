@@ -679,4 +679,4 @@ void main(void)
         ;
 }
 
-SYS_INIT(init_wdt, PRE_KERNEL_2, CONFIG_KERNEL_INIT_PRIORITY_OBJECTS);  /* PRE_KERNEL_1 won't work, except use nrfx driver directly   */
+SYS_INIT(init_wdt, PRE_KERNEL_2, CONFIG_KERNEL_INIT_PRIORITY_DEVICE);  /* PRE_KERNEL_1 won't work, except use nrfx driver directly   */
